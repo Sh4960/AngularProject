@@ -1,0 +1,38 @@
+<div>
+    <form [formGroup]="frmDonor">
+        
+        <div class="form-group">
+            <div class="form-label">donor tz</div>
+            <div>
+                <input type="text" class="form-control" formControlName="donor_tz"/>
+                <div class="text-danger" *ngIf="frmDonor.controls['donor_tz'].touched && frmDonor.controls['donor_tz'].errors && frmDonor.controls['donor_tz'].errors['required']">שדה חובה</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="form-label">donor name</div>
+            <div>
+                <input type="text" class="form-control" formControlName="donor_name"/>
+                <div class="text-danger" *ngIf="frmDonor.controls['donor_name'].touched && frmDonor.controls['donor_name'].errors && frmDonor.controls['donor_name'].errors['required']">שדה חובה</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="form-label">email</div>
+            <div>
+                <input type="text" class="form-control" formControlName="email"/>
+                <div class="text-danger" *ngIf="frmDonor.controls['email'].touched && frmDonor.controls['email'].errors && frmDonor.controls['email'].errors['required']">שדה חובה</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="form-label">phone</div>
+            <div>
+                <input type="text" class="form-control" formControlName="phone"/>
+                <div class="text-danger" *ngIf="frmDonor.controls['phone'].touched && frmDonor.controls['phone'].errors && frmDonor.controls['phone'].errors['required']">שדה חובה</div>
+            </div>
+        </div>
+
+        <button></button>
+    </form>
+</div>

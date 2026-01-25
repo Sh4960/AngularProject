@@ -30,7 +30,11 @@
               }
             ],
             "styles": [
+              "bootstrap/dist/css/bootstrap.css",
               "src/styles.scss"
+            ],
+               "scripts":[
+              "bootstrap/dist/js/bootstrap.js"
             ]
           },
           "configurations": {
@@ -88,11 +92,15 @@
               }
             ],
             "styles": [
+              "bootstrap/dist/css/bootstrap.css",      
               "src/styles.scss"
             ]
           }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "0957b0c2-d91c-44ba-87ed-6b972dd5b55f"
   }
 }

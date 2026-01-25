@@ -1,0 +1,64 @@
+<div>
+    <form [formGroup]="frmGift">
+
+
+            <div class="form-group">
+                <div class="form-label">Gift Name</div>
+                <div>
+                    <input type="text" class="form-control" formControlName="name" />
+                    <div class="text-danger" *ngIf="frmGift.controls['name'].touched && frmGift.controls['name'].errors?.['required']">Required field</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">Donor Name</div>
+                <div>
+                    <input type="text" class="form-control" formControlName="donorName" />
+                    <div class="text-danger" *ngIf="frmGift.controls['donorName'].touched && frmGift.controls['donorName'].errors?.['required']">Required field</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">Donor id</div>
+                <div>
+                    <input type="text" class="form-control" formControlName="donorId" />
+                    <!-- <div class="text-danger" *ngIf="frmGift.controls['donorName'].touched && frmGift.controls['donorName'].errors?.['required']">Required field</div> -->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">Card Price</div>
+                <div>
+                    <input type="number" class="form-control" formControlName="cardPrice" />
+                    <div class="text-danger" *ngIf="frmGift.controls['cardPrice'].touched && frmGift.controls['cardPrice'].errors?.['required']">Required field</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">Category</div>
+                <div>
+                    <input type="text" class="form-control" formControlName="category" />
+                </div>
+            </div>
+
+            <!-- <div class="form-group">
+                <div class="form-label">Is Raffled</div>
+                <div>
+                    <input type="checkbox" formControlName="isRaffled" />
+                </div>
+            </div> -->
+            <!-- <select formControlName="donorId">
+                <option value="">בחר תורם</option>
+                <option *ngFor="let d of donors" [value]="d.id">
+                  {{ d.name }}
+                </option>
+              </select>
+               -->
+               <div *ngIf="serverError" class="error-message">
+                ⚠️ {{ serverError }}
+              </div>
+            <button type="button" (click)="saveGift()">Save</button>
+            <button type="button" (click)="cancel()">Cancel</button>
+        </form>
+</div>
+

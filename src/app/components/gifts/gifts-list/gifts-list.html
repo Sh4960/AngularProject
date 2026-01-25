@@ -1,0 +1,30 @@
+<h3>Gifts List</h3>
+<table class="table-bordered">
+  <thead>
+    <tr>
+      <th>Gift ID</th>
+      <th>Gift Name</th>
+      <th>Donor Name</th>
+      <th>Card Price</th>
+      <th>Category</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let g of giftsArr; trackBy: trackById">
+      <td>{{ g?.id }}</td>
+      <td>{{ g?.name }}</td>
+      <td>{{ g?.donorName }}</td>
+      <td>{{ g?.cardPrice }}</td>
+      <td>{{ g?.category }}</td>
+      <td>
+        <button (click)="removeGift(g?.id || 0)">❌</button>
+        <button (click)="updateGift(g?.id || 0)">✏️</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<button (click)="id = 0">➕ Add Gift</button>
+<app-gift *ngIf="id >= 0" [(selectedId)]="id" 
+(selectedIdChange)="onGiftSaved($event)"
+></app-gift>
