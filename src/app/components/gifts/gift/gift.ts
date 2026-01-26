@@ -6,9 +6,10 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-gift',
+  standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './gift.html',
-  styleUrl: './gift.scss',
+  styleUrls: ['./gift.scss'], // <--- תוקן
 })
 export class Gift {
   giftSrv: GiftService = inject(GiftService);
@@ -26,112 +27,57 @@ export class Gift {
     cardPrice: new FormControl(10, [Validators.required]),
     category: new FormControl(''),
     donorId: new FormControl(null, Validators.required),
-    isRaffled: new FormControl(false), // Added field with default value
+    isRaffled: new FormControl(false),
   });
 
-  serverError: string | null = null; // משתנה חדש לשמירת הודעת השגיאה
-  // saveGift() {
-  //   let gift: GiftModel = this.frmGift.value;
-  //   if (this.selectedId > 0) {
-  //     this.giftSrv.updateGift(gift).subscribe(() => {
-  //       this.selectedIdChange.emit(-1);
-  //     });
-  //   } else {
-  //     this.giftSrv.addGift(gift).subscribe(() => {
-  //       this.selectedIdChange.emit(-1);
-  //     });
-  //   }
-  // }
-// saveGift() {
-//   if (this.frmGift.invalid) {
-//     console.error('Form is invalid', this.frmGift.errors);
-//     return;
-//   }
+  serverError: string | null = null;
 
-//   // Prepare DTO matching exactly GiftDTO expected by backend
-//   let giftDTO = {
-//     id: this.frmGift.value.id,
-//     name: this.frmGift.value.name?.trim() || '',
-//     category: this.frmGift.value.category?.trim() || '',
-//     cardPrice: this.frmGift.value.cardPrice,
-//     donorId: this.frmGift.value.donorId,
-//     donorName: this.frmGift.value.donorName?.trim() || '',
-//     isRaffled: this.frmGift.value.isRaffled
-//   };
+  saveGift() {
+    this.serverError = null;
+    if (this.frmGift.invalid) {
+      this.serverError = 'Form is invalid';
+      return;
+    }
 
-//   if (this.selectedId > 0) {
-//     this.giftSrv.updateGift(giftDTO).subscribe({
-//       next: () => this.selectedIdChange.emit(-1),
-//       error: err => console.error('Update failed', err)
-//     });
-//   } else {
-//     this.giftSrv.addGift(giftDTO).subscribe({
-//       next: () => this.selectedIdChange.emit(-1),
-//       error: err => console.error('Add failed', err)
-//     });
-//   }
-// }
+    const giftDTO: GiftModel = this.frmGift.value;
 
-saveGift() {
-  this.serverError = null;
-  if (this.frmGift.invalid) {
-    // console.error('Form is invalid', this.frmGift.errors);
-    this.serverError = 'Form is invalid'
-    return;
-  }
+    const obs = this.selectedId > 0
+      ? this.giftSrv.updateGift(giftDTO)
+      : this.giftSrv.addGift(giftDTO);
 
-  let giftDTO = {
-    id: this.frmGift.value.id,
-    name: this.frmGift.value.name?.trim() || '',
-    category: this.frmGift.value.category?.trim() || '',
-    cardPrice: this.frmGift.value.cardPrice,
-    donorId: this.frmGift.value.donorId,
-    donorName: this.frmGift.value.donorName?.trim() || '',
-    isRaffled: this.frmGift.value.isRaffled
-  };
-
-  if (this.selectedId > 0) {
-    this.giftSrv.updateGift(giftDTO).subscribe({
+    obs.subscribe({
       next: () => this.selectedIdChange.emit(-1),
-      error: err => {
-        if (err.status === 400 && err.error?.Errors) {
-          // console.error('Validation errors:', err.error.Errors);
-          this.serverError = Object.values(err.error.Errors).join(', ');
-        } else {
-          // console.error('Update failed', err);
-          this.serverError = 'Update failed'
+      error: (err: any) => {
+        console.log('HTTP error', err);
+        if (err?.status === 401 || err?.status === 403) {
+          this.serverError = 'Not authorized (please login).';
+          return;
         }
-      }
-    });
-  } else {
-    this.giftSrv.addGift(giftDTO).subscribe({
-      next: () => this.selectedIdChange.emit(-1),
-      error: err => {
-        if (err.status === 400 && err.error?.Errors) {
-          // console.error('Validation errors:', err.error.Errors);
-          this.serverError = Object.values(err.error.Errors).join(', ')
+        // הצג את התוכן שה־API החזיר במדויק (string או JSON stringified)
+        const body = err?.error;
+        if (body === undefined || body === null) {
+          this.serverError = err?.message ?? 'Server error';
+        } else if (typeof body === 'string') {
+          this.serverError = body;
         } else {
-          // console.error('Add failed', err);
-          this.serverError = 'Add failed'
+          try {
+            this.serverError = JSON.stringify(body);
+          } catch {
+            this.serverError = String(body);
+          }
         }
       }
     });
   }
-}
 
-
-  ngOnChanges(c: SimpleChanges) {
-    if (c['selectedId']) {
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedId']) {
       this.serverError = null;
       if (this.selectedId > 0) {
         this.giftSrv.getGiftById(this.selectedId).subscribe((gift) => {
-          if (gift) {
-            this.frmGift.setValue(gift);
-          }
+          if (gift) this.frmGift.setValue(gift);
         });
-      }
-
-      if (this.selectedId === 0) {
+      } else if (this.selectedId === 0) {
         this.frmGift.reset({
           id: 0,
           name: '',
@@ -139,7 +85,7 @@ saveGift() {
           cardPrice: 10,
           category: '',
           donorId: 0,
-          isRaffled: false, // Reset default value
+          isRaffled: false,
         });
       }
     }
@@ -149,14 +95,8 @@ saveGift() {
     this.serverError = null;
     if (this.selectedId > 0) {
       this.giftSrv.getGiftById(this.selectedId).subscribe((gift) => {
-        if (gift) {
-          this.frmGift.setValue(gift);
-        }
+        if (gift) this.frmGift.setValue(gift);
       });
     }
   }
 }
-
-
-
-
