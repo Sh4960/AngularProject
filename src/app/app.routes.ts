@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { Login } from './components/login/login/login';
 import { Register } from './components/register/register/register';
 import { GiftsList } from './components/gifts/gifts-list/gifts-list';
+import { DonorsList } from './components/donors/donors-list/donors-list';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },

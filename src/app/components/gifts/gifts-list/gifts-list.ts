@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './gifts-list.html',
   styleUrls: ['./gifts-list.scss'],
 })
-export class GiftsList implements OnInit {
+export class GiftsList {
   giftsArr: GiftModel[] = [];
   giftSrv: GiftService = inject(GiftService);
   id: number = -1;
@@ -48,25 +48,16 @@ export class GiftsList implements OnInit {
     });
   }
 
+  addGift(gift: GiftModel) {
+    this.giftSrv.addGift(gift).subscribe(() => {
+      this.loadGifts();
+    });
+  }
+  
   removeGift(giftID: number) {
     if (confirm('האם אתה בטוח שברצונך למחוק?')) {
-      this.giftSrv.removeGift(giftID).subscribe({
-        next: () => this.loadGifts(),
-        error: err => {
-          console.error('Remove gift error', err);
-          let msg = 'Failed to remove gift';
-          if (!err) msg = 'Unknown error';
-          else if (err.status === 0) msg = 'Network error: cannot reach server';
-          else if (err.status === 401 || err.status === 403) msg = 'Not authorized';
-          else if (err?.error) {
-            if (typeof err.error === 'string') msg = err.error;
-            else if (err.error.message) msg = String(err.error.message);
-            else if (err.error.Message) msg = String(err.error.Message);
-            else { try { msg = JSON.stringify(err.error); } catch { msg = String(err.error); } }
-          } else msg = err.message ?? msg;
-
-          console.error('Error message:', msg);
-        }
+      this.giftSrv.removeGift(giftID).subscribe(() => {
+        this.loadGifts();
       });
     }
   }

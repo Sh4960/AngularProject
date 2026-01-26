@@ -19,7 +19,7 @@ export class Gift {
 
   @Output()
   selectedIdChange: EventEmitter<number> = new EventEmitter<number>();
-
+  
   frmGift: FormGroup = new FormGroup({
     id: new FormControl(0, [Validators.required]),
     name: new FormControl('', [Validators.required]),

@@ -1,10 +1,8 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { DonorModel } from '../models/donor-model';
 import { HttpClient } from '@angular/common/http';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class DonorService {
     
   BASE_URL: string = 'https://localhost:7164/api/Donor';
@@ -19,7 +17,7 @@ export class DonorService {
   }
 
   updateDonor(d: DonorModel){
-      return this.httpClient.put<DonorModel>(this.BASE_URL, d);
+      return this.httpClient.put<DonorModel>(`${this.BASE_URL}/${d.id}`, d);
   }
 
   getDonorById(donorId: number){
@@ -27,6 +25,6 @@ export class DonorService {
   }
 
   removeDonor(donorId: number){
-      return this.httpClient.delete<void>(this.BASE_URL + '?id=' + donorId);
+      return this.httpClient.delete<void>(`${this.BASE_URL}/${donorId}`);
   }
 }

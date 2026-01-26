@@ -1,1 +1,27 @@
-<p>donors-list works!</p>
+<h3>Donors List</h3>
+<table class="table-bordered">
+  <thead>
+    <tr>
+      <th>Donor ID</th>
+      <th>Donor Name</th>
+      <th>Donor Email</th>
+      <th>Donor Phone</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let d of donorsArr; trackBy: trackById">
+      <td>{{ d?.id }}</td>
+      <td>{{ d?.name }}</td>
+      <td>{{ d?.phone }}</td>
+      <td>{{ d?.email }}</td>
+      <td>
+        <button (click)="removeDonor(d?.id || 0)">❌</button>
+        <button (click)="updateDonor(d?.id || 0)">✏️</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<button (click)="id = 0">➕ Add Donor</button>
+<app-donor *ngIf="id >= 0" [(selectedId)]="id" 
+(selectedIdChange)="onDonorSaved($event)"
+></app-donor>
