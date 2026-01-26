@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './gift.html',
-  styleUrls: ['./gift.scss'], // <--- תוקן
+  styleUrls: ['./gift.scss'],
 })
 export class Gift {
   giftSrv: GiftService = inject(GiftService);

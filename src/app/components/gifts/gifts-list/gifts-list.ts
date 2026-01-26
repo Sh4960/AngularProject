@@ -43,7 +43,7 @@ export class GiftsList implements OnInit {
           }
         } else msg = err.message ?? msg;
 
-        alert(msg);
+        console.error('Error message:', msg);
       }
     });
   }
@@ -65,7 +65,7 @@ export class GiftsList implements OnInit {
             else { try { msg = JSON.stringify(err.error); } catch { msg = String(err.error); } }
           } else msg = err.message ?? msg;
 
-          alert(msg);
+          console.error('Error message:', msg);
         }
       });
     }

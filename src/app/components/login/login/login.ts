@@ -4,15 +4,18 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth-service';
+import { Router, RouterLink } from '@angular/router';
+
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterLink],
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
 })
 export class Login {
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   // שדות קלט למייל וסיסמה שמקושרים ל-ngModel שבHTML
   email = '';
@@ -24,7 +27,13 @@ export class Login {
     this.errorMsg = '';
     this.authService.login(this.email, this.password).subscribe({
       // אם ההתחברות הצליחה – שומרים את הטוקן ב-localStorage
-      next: res => this.authService.saveToken(res.token),
+         next: res => {
+      this.authService.saveToken(res.token); // שמירת טוקן
+      if (this.authService.isLoggedIn()) {    // בדיקה אם ההתחברות הצליחה
+        this.router.navigate(['/gifts']);    // ניווט אוטומטי
+      }
+    },    
+      // אם יש שגיאה – מפענחים ומציגים הודעת שגיאה מתאימה
       error: err => {
         // // רישום שגיאה לקונסול
         // console.error('Login error', err);
