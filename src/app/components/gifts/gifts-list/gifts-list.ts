@@ -3,6 +3,8 @@ import { GiftService } from '../../../services/gift-service';
 import { GiftModel } from '../../../models/gift-model';
 import { Gift } from '../gift/gift';
 import { CommonModule } from '@angular/common';
+import { ShoppingService } from '../../../services/shopping-service';
+import { ShoppingCreateModel } from '../../../models/shopping/ShoppingCreate -model';
 
 @Component({
   selector: 'app-gifts-list',
@@ -14,8 +16,11 @@ import { CommonModule } from '@angular/common';
 export class GiftsList {
   giftsArr: GiftModel[] = [];
   giftSrv: GiftService = inject(GiftService);
-  id: number = -1;
+  shoppingSrv: ShoppingService = inject(ShoppingService);
 
+  id: number = -1;
+  userId = 1002; // מזהה משתמש לדוגמה צריך לשנות את זה ולקבל את המשתמש האמיתי מהטוקן
+  
   ngOnInit() {
     this.loadGifts(); // קריאה ראשונית
   }
@@ -45,6 +50,19 @@ export class GiftsList {
 
         console.error('Error message:', msg);
       }
+    });
+  }
+
+  addToCart(giftId: number) {
+    const data: ShoppingCreateModel = {
+      userId: this.userId,
+      giftId: giftId,
+      quantity: 1
+    };
+
+    this.shoppingSrv.addShopping(data).subscribe({
+      next: () => alert('נוסף לסל'),
+      error: err => console.error(err)
     });
   }
 
