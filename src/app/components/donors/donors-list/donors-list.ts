@@ -49,30 +49,18 @@ export class DonorsList {
       }
     });
   }
-
+  addDonor(donor: DonorModel) {
+    this.donorSrv.addDonor(donor).subscribe(() => {
+      this.loadDonors();
+    });
+  }
   removeDonor(donorID: number) {
     if (confirm('האם אתה בטוח שברצונך למחוק?')) {
-      this.donorSrv.removeDonor(donorID).subscribe({
-        next: () => this.loadDonors(),
-        error: err => {
-          console.error('Remove donor error', err);
-          let msg = 'Failed to remove donor';
-          if (!err) msg = 'Unknown error';
-          else if (err.status === 0) msg = 'Network error: cannot reach server';
-          else if (err.status === 401 || err.status === 403) msg = 'Not authorized';
-          else if (err?.error) {
-            if (typeof err.error === 'string') msg = err.error;
-            else if (err.error.message) msg = String(err.error.message);
-            else if (err.error.Message) msg = String(err.error.Message);
-            else { try { msg = JSON.stringify(err.error); } catch { msg = String(err.error); } }
-          } else msg = err.message ?? msg;
-
-          console.error('Error message:', msg);
-        }
+      this.donorSrv.removeDonor(donorID).subscribe(() => {
+        this.loadDonors();
       });
     }
   }
-
   updateDonor(donorID: number) {
     this.id = donorID;
   }
