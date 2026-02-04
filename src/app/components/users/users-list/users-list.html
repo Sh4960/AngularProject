@@ -1,0 +1,32 @@
+<h3>Users List</h3>
+
+@if (errorMsg) {
+  <div class="alert alert-danger">{{ errorMsg }}</div>
+}
+
+<table class="table-bordered">
+  <thead>
+    <tr>
+      <th>User ID</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (user of users$ | async; track user.id) {
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.userName }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.phone }}</td>
+        <td>{{ user.role || 'User' }}</td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+@if ((users$ | async)?.length === 0) {
+  <p>No users found</p>
+}

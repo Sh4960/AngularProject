@@ -26,7 +26,7 @@ export class Gift {
     donorName: new FormControl('', [Validators.required]),
     cardPrice: new FormControl(10, [Validators.required]),
     category: new FormControl(''),
-    donorId: new FormControl(null, Validators.required),
+    donorId: new FormControl('', Validators.required),
     isRaffled: new FormControl(false),
   });
 
@@ -71,9 +71,17 @@ export class Gift {
           this.frmGift.patchValue(gift);
         });
       } else if (this.selectedId === 0) {
-        // מתנה חדשה
+        // מתנה חדשה - איפוס עם ערכי ברירת מחדל
         this.currentGift = null;
-        this.frmGift.reset();
+        this.frmGift.patchValue({
+          id: 0,
+          name: '',
+          donorName: '',
+          cardPrice: 10,
+          category: '',
+          donorId: '',
+          isRaffled: false
+        });
       } else {
         // ביטול עריכה
         this.currentGift = null;

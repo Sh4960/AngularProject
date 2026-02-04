@@ -4,6 +4,7 @@
   @if (isLoggedIn()) {
     @if (isManager()) {
       <a routerLink="/donors">Donors</a>
+      <a routerLink="/users">Users</a>
     }
     <a routerLink="/shoppings">Cart</a>
     <button (click)="logout()">Logout</button>

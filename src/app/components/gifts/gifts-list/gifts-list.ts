@@ -17,7 +17,6 @@ import { Observable } from 'rxjs';
   styleUrls: ['./gifts-list.scss'],
 })
 export class GiftsList {
-  // זריקת שירותים
   giftSrv = inject(GiftService);
   shoppingSrv = inject(ShoppingService);
   authSrv = inject(AuthService);
@@ -46,9 +45,7 @@ export class GiftsList {
       return;
     }
 
-    // איפוס הודעת שגיאה
     this.errorMsg = '';
-
     const userId = this.authSrv.getUserIdFromToken();
     const data: ShoppingCreateModel = {
       userId: userId,
@@ -57,11 +54,10 @@ export class GiftsList {
     };
 
     this.shoppingSrv.addShopping(data).subscribe({
-      next: () => {
+      next: (response) => {
         this.router.navigate(['/shoppings']);
       },
       error: (err) => {
-        // הצגת השגיאה המדויקת מהשרת
         if (typeof err.error === 'string') {
           this.errorMsg = err.error;
         } else if (err.error?.title) {
@@ -69,7 +65,7 @@ export class GiftsList {
         } else if (err.error?.message) {
           this.errorMsg = err.error.message;
         } else {
-          this.errorMsg = 'Error adding to cart (Status: ' + err.status + ')';
+          this.errorMsg = 'Error adding to cart';
         }
       }
     });

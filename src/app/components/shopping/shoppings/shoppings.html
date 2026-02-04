@@ -1,7 +1,6 @@
 <div>
   <h2>Shopping Cart</h2>
 
-  <!-- הצגת שגיאה מהשרת -->
   @if (errorMsg) {
     <div style="color:red">{{ errorMsg }}</div>
   }
@@ -12,24 +11,38 @@
       <p>No purchases</p>
     } @else {
       
-      @for (shopping of shoppings; track shopping.id) {
-        <div class="shopping-item">
-          <p>Purchase ID: {{ shopping.id }}</p>
-          <p>Gift: {{ shopping.giftId }}</p>
-          <p>Quantity: {{ shopping.quantity }}</p>
-          <p>Name: {{ shopping.userName }}</p>
-          <p>Email: {{ shopping.email }}</p>
-          <p>Phone: {{ shopping.phone }}</p>
-          
-          <button (click)="confirmShopping(shopping.id)">Confirm Purchase</button>
-          <button (click)="removeShopping(shopping.id)">Delete</button>
-        </div>
-      }
+      <table class="table-bordered">
+        <thead>
+          <tr>
+            <th>Gift Name</th>
+            <th>Card Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (shopping of shoppings; track shopping.id) {
+            <tr>
+              <td>{{ shopping.giftName }}</td>
+              <td>{{ shopping.cardPrice }}</td>
+              <td>{{ shopping.quantity }}</td>
+              <td>{{ shopping.cardPrice * shopping.quantity }}</td>
+              <td>
+                <button (click)="confirmShopping(shopping)">✅</button>
+                <button (click)="removeShopping(shopping)">❌</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="total-section">
+        <h3>Total to Pay: {{ getTotalPrice(shoppings) }}</h3>
+      </div>
       
     }
     
-  } @else {
-    <p>Loading...</p>
   }
 
 </div>

@@ -18,7 +18,7 @@ export class ShoppingService {
   } 
 
   addShopping(s:ShoppingCreateModel){
-      return this.httpClient.post<ShoppingCreateModel>(this.BASE_URL, s, { headers: this.authService.getAuthHeaders(), responseType: 'text' as 'json' });
+      return this.httpClient.post(this.BASE_URL, s, { headers: this.authService.getAuthHeaders(), responseType: 'text' });
   }
 
   updateShopping(s: ShoppingModel){
@@ -35,6 +35,6 @@ export class ShoppingService {
 
   // פונקציה לאישור רכישה - מעבר מטיוטא לרכישה מאושרת
   confirmShopping(shoppingId: number) {
-      return this.httpClient.post(`${this.BASE_URL}/${shoppingId}/confirm`, {}, { headers: this.authService.getAuthHeaders() });
+      return this.httpClient.post(`${this.BASE_URL}/${shoppingId}/confirm`, {}, { headers: this.authService.getAuthHeaders(), responseType: 'text' });
   }
 }

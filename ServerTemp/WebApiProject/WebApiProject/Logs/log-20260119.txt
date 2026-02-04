@@ -1,0 +1,54 @@
+2026-01-19 16:22:35.213 +02:00 [INF] User profile is available. Using 'C:\Users\user1\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-01-19 16:22:35.994 +02:00 [INF] Now listening on: https://localhost:7164
+2026-01-19 16:22:36.000 +02:00 [INF] Now listening on: http://localhost:5205
+2026-01-19 16:22:36.158 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-01-19 16:22:36.163 +02:00 [INF] Hosting environment: Development
+2026-01-19 16:22:36.169 +02:00 [INF] Content root path: C:\Users\user1\Desktop\מעודכן\WebApiProject\WebApiProject
+2026-01-19 16:22:37.254 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7164/swagger - null null
+2026-01-19 16:22:38.240 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7164/swagger - 301 0 null 1006.0892ms
+2026-01-19 16:22:38.274 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7164/swagger/index.html - null null
+2026-01-19 16:22:38.609 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7164/swagger/swagger-ui-bundle.js - null null
+2026-01-19 16:22:38.687 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7164/_framework/aspnetcore-browser-refresh.js - null null
+2026-01-19 16:22:38.612 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7164/swagger/swagger-ui.css - null null
+2026-01-19 16:22:38.612 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7164/swagger/swagger-ui-standalone-preset.js - null null
+2026-01-19 16:22:38.772 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7164/_framework/aspnetcore-browser-refresh.js - 200 16511 application/javascript; charset=utf-8 88.8589ms
+2026-01-19 16:22:38.705 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7164/swagger/index.html - 200 null text/html;charset=utf-8 433.2208ms
+2026-01-19 16:22:38.958 +02:00 [INF] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A'
+2026-01-19 16:22:38.958 +02:00 [INF] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A'
+2026-01-19 16:22:38.982 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7164/swagger/swagger-ui.css - 200 143943 text/css 370.5122ms
+2026-01-19 16:22:38.998 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7164/_vs/browserLink - null null
+2026-01-19 16:22:38.999 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7164/swagger/swagger-ui-standalone-preset.js - 200 339486 text/javascript 387.1974ms
+2026-01-19 16:22:39.014 +02:00 [INF] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A'
+2026-01-19 16:22:39.094 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7164/swagger/swagger-ui-bundle.js - 200 1096145 text/javascript 487.1739ms
+2026-01-19 16:22:39.224 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7164/_vs/browserLink - 200 null text/javascript; charset=UTF-8 227.8396ms
+2026-01-19 16:22:39.371 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7164/swagger/v1/swagger.json - null null
+2026-01-19 16:22:39.422 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7164/swagger/favicon-32x32.png - null null
+2026-01-19 16:22:39.440 +02:00 [INF] Sending file. Request path: '/favicon-32x32.png'. Physical path: 'N/A'
+2026-01-19 16:22:39.450 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7164/swagger/favicon-32x32.png - 200 628 image/png 28.9837ms
+2026-01-19 16:22:39.477 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7164/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 106.581ms
+2026-01-19 16:22:45.879 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7164/api/RafflePdf/winners - null null
+2026-01-19 16:22:46.231 +02:00 [INF] Executing endpoint 'WebApiProject.Controllers.RafflePdfController.GetRaffleWinnersPdf (WebApiProject)'
+2026-01-19 16:22:46.308 +02:00 [INF] Route matched with {action = "GetRaffleWinnersPdf", controller = "RafflePdf"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetRaffleWinnersPdf() on controller WebApiProject.Controllers.RafflePdfController (WebApiProject).
+2026-01-19 16:22:47.151 +02:00 [INF] Executing action method WebApiProject.Controllers.RafflePdfController.GetRaffleWinnersPdf (WebApiProject) - Validation state: "Valid"
+2026-01-19 16:22:52.949 +02:00 [INF] Executed DbCommand (272ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [g].[Id], [g].[CardPrice], [g].[Category], [g].[DonorId], [g].[IsRaffled], [g].[Name], [d].[Id], [d].[Email], [d].[Name], [d].[Phone], [t].[Id], [t].[GiftId], [t].[IsDraft], [t].[Quantity], [t].[UserId], [t].[Id0], [t].[Email], [t].[PasswordHash], [t].[Phone], [t].[Role], [t].[UserName]
+FROM [Gifts] AS [g]
+INNER JOIN [Donors] AS [d] ON [g].[DonorId] = [d].[Id]
+LEFT JOIN (
+    SELECT [s].[Id], [s].[GiftId], [s].[IsDraft], [s].[Quantity], [s].[UserId], [u].[Id] AS [Id0], [u].[Email], [u].[PasswordHash], [u].[Phone], [u].[Role], [u].[UserName]
+    FROM [Shoppings] AS [s]
+    INNER JOIN [Users] AS [u] ON [s].[UserId] = [u].[Id]
+) AS [t] ON [g].[Id] = [t].[GiftId]
+WHERE [g].[IsRaffled] = CAST(1 AS bit)
+ORDER BY [g].[Id], [d].[Id], [t].[Id]
+2026-01-19 16:22:55.548 +02:00 [INF] Executed action method WebApiProject.Controllers.RafflePdfController.GetRaffleWinnersPdf (WebApiProject), returned result Microsoft.AspNetCore.Mvc.FileContentResult in 8379.3416ms.
+2026-01-19 16:22:55.569 +02:00 [INF] Executing FileContentResult, sending file with download name 'RaffleWinners_20260119_1622.pdf' ...
+2026-01-19 16:22:55.635 +02:00 [INF] Executed action WebApiProject.Controllers.RafflePdfController.GetRaffleWinnersPdf (WebApiProject) in 9300.8818ms
+2026-01-19 16:22:55.643 +02:00 [INF] Executed endpoint 'WebApiProject.Controllers.RafflePdfController.GetRaffleWinnersPdf (WebApiProject)'
+2026-01-19 16:22:55.670 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7164/api/RafflePdf/winners - 200 46394 application/pdf 9791.328ms
+2026-01-19 16:23:33.689 +02:00 [INF] Request starting HTTP/2 POST https://localhost:7164/api/Gift/raffleAll - null 0
+2026-01-19 16:23:33.764 +02:00 [INF] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (Manager)
+2026-01-19 16:23:33.801 +02:00 [INF] AuthenticationScheme: Bearer was challenged.
+2026-01-19 16:23:33.808 +02:00 [INF] Request finished HTTP/2 POST https://localhost:7164/api/Gift/raffleAll - 401 null application/json; charset=utf-8 118.8728ms

@@ -6,5 +6,7 @@ export class ShoppingModel {
     userName: string = '';
     email: string = '';
     phone: string = '';
+    giftName: string = '';
+    cardPrice: number = 0;
   }
   

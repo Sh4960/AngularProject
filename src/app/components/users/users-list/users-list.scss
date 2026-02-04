@@ -1,0 +1,30 @@
+.table-bordered {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.table-bordered th, .table-bordered td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: right;
+}
+
+.table-bordered th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+h3 {
+  color: #333;
+  margin-bottom: 15px;
+}

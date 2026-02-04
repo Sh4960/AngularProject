@@ -24,7 +24,10 @@
             <div class="form-group">
                 <div class="form-label">Donor ID</div>
                 <div>
-                    <input type="text" class="form-control" formControlName="donorId" />
+                    <input type="number" class="form-control" formControlName="donorId" />
+                    @if (frmGift.controls['donorId'].touched && frmGift.controls['donorId'].errors?.['required']) {
+                        <div class="text-danger">Required field</div>
+                    }
                 </div>
             </div>
 
