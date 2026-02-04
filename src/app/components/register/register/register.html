@@ -1,47 +1,68 @@
 <h2>Register</h2>
 
-<!-- User Name -->
+<!-- שם משתמש -->
 <div>
-  <input [(ngModel)]="user.userName" placeholder="User name" [class.is-invalid]="errors['userName']?.length" />
-  <div *ngIf="errors['userName']?.length">
-    <small *ngFor="let err of errors['userName']" class="text-danger">{{ err }}</small>
-  </div>
+  <input [(ngModel)]="user.userName" placeholder="Username" />
+  @if (errors['userName']?.length) {
+    <div>
+      @for (err of errors['userName']; track err) {
+        <small style="color:red">{{ err }}</small>
+      }
+    </div>
+  }
 </div>
 
-<!-- Email -->
+<!-- אימייל -->
 <div>
-  <input [(ngModel)]="user.email" placeholder="Email" [class.is-invalid]="errors['email']?.length" />
-  <div *ngIf="errors['email']?.length">
-    <small *ngFor="let err of errors['email']" class="text-danger">{{ err }}</small>
-  </div>
+  <input [(ngModel)]="user.email" placeholder="Email" />
+  @if (errors['email']?.length) {
+    <div>
+      @for (err of errors['email']; track err) {
+        <small style="color:red">{{ err }}</small>
+      }
+    </div>
+  }
 </div>
 
-<!-- Phone -->
+<!-- טלפון -->
 <div>
-  <input [(ngModel)]="user.phone" placeholder="Phone" [class.is-invalid]="errors['phone']?.length" />
-  <div *ngIf="errors['phone']?.length">
-    <small *ngFor="let err of errors['phone']" class="text-danger">{{ err }}</small>
-  </div>
+  <input [(ngModel)]="user.phone" placeholder="Phone" />
+  @if (errors['phone']?.length) {
+    <div>
+      @for (err of errors['phone']; track err) {
+        <small style="color:red">{{ err }}</small>
+      }
+    </div>
+  }
 </div>
 
-<!-- Password -->
+<!-- סיסמא -->
 <div>
-  <input [(ngModel)]="user.password" type="password" placeholder="Password" [class.is-invalid]="errors['password']?.length" />
-  <div *ngIf="errors['password']?.length">
-    <small *ngFor="let err of errors['password']" class="text-danger">{{ err }}</small>
-  </div>
+  <input [(ngModel)]="user.password" type="password" placeholder="Password" />
+  @if (errors['password']?.length) {
+    <div>
+      @for (err of errors['password']; track err) {
+        <small style="color:red">{{ err }}</small>
+      }
+    </div>
+  }
 </div>
 
-<!-- Register Button -->
 <button (click)="register()">Register</button>
 
-<!-- Success message -->
-<div *ngIf="successMessage" style="color:green">{{ successMessage }}</div>
+<!-- הודעת הצלחה -->
+@if (successMessage) {
+  <div style="color:green">{{ successMessage }}</div>
+}
 
-<!-- General errors -->
-<div *ngIf="errors['general']">
-  <div *ngFor="let err of errors['general']" style="color:red">{{ err }}</div>
-</div>
+<!-- שגיאות כלליות -->
+@if (errors['general']?.length) {
+  <div>
+    @for (err of errors['general']; track err) {
+      <div style="color:red">{{ err }}</div>
+    }
+  </div>
+}
 
-<p>כבר רשום? <a routerLink="/login">התחבר כאן</a></p>
+<p>Already registered? <a routerLink="/login">Login here</a></p>
 

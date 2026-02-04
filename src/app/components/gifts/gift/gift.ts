@@ -31,15 +31,25 @@ export class Gift {
   });
 
   serverError: string | null = null;
+  currentGift: GiftModel | null = null; // שמירת המתנה הנוכחית עם הרכישות
 
   saveGift() {
     this.serverError = null;
     if (this.frmGift.invalid) {
-      this.serverError = 'Form is invalid';
+      this.serverError = 'Please fill in all required fields';
       return;
     }
 
-    const giftDTO: GiftModel = this.frmGift.value;
+    // יצירת אובייקט מתנה לשליחה לשרת
+    const giftDTO: any = {
+      id: this.frmGift.value.id,
+      name: this.frmGift.value.name,
+      donorName: this.frmGift.value.donorName,
+      cardPrice: this.frmGift.value.cardPrice,
+      category: this.frmGift.value.category || '',
+      donorId: this.frmGift.value.donorId,
+      isRaffled: this.frmGift.value.isRaffled
+    };
 
     const obs = this.selectedId > 0
       ? this.giftSrv.updateGift(giftDTO)
@@ -47,56 +57,32 @@ export class Gift {
 
     obs.subscribe({
       next: () => this.selectedIdChange.emit(-1),
-      error: (err: any) => {
-        console.log('HTTP error', err);
-        if (err?.status === 401 || err?.status === 403) {
-          this.serverError = 'Not authorized (please login).';
-          return;
-        }
-        // הצג את התוכן שה־API החזיר במדויק (string או JSON stringified)
-        const body = err?.error;
-        if (body === undefined || body === null) {
-          this.serverError = err?.message ?? 'Server error';
-        } else if (typeof body === 'string') {
-          this.serverError = body;
-        } else {
-          try {
-            this.serverError = JSON.stringify(body);
-          } catch {
-            this.serverError = String(body);
-          }
-        }
-      }
+      error: (err) => this.serverError = err.error || err.message || 'שגיאה בשמירת מתנה'
     });
   }
 
+  // מעדכן טופס כשיד מתנה משתנה
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedId']) {
-      this.serverError = null;
       if (this.selectedId > 0) {
+        // עריכת מתנה קיימת
         this.giftSrv.getGiftById(this.selectedId).subscribe((gift) => {
-          if (gift) this.frmGift.setValue(gift);
+          this.currentGift = gift; // שמירת המתנה עם הרכישות
+          this.frmGift.patchValue(gift);
         });
       } else if (this.selectedId === 0) {
-        this.frmGift.reset({
-          id: 0,
-          name: '',
-          donorName: '',
-          cardPrice: 10,
-          category: '',
-          donorId: 0,
-          isRaffled: false,
-        });
+        // מתנה חדשה
+        this.currentGift = null;
+        this.frmGift.reset();
+      } else {
+        // ביטול עריכה
+        this.currentGift = null;
       }
     }
   }
 
+  // ביטול עריכה
   cancel() {
-    this.serverError = null;
-    if (this.selectedId > 0) {
-      this.giftSrv.getGiftById(this.selectedId).subscribe((gift) => {
-        if (gift) this.frmGift.setValue(gift);
-      });
-    }
+    this.selectedIdChange.emit(-1);
   }
 }

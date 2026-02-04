@@ -1,42 +1,44 @@
 <div>
     <form [formGroup]="frmDonor">
-        
-        <!-- <div class="form-group">
-            <div class="form-label">donor id</div>
-            <div>
-                <input type="text" class="form-control" formControlName="id"/>
-                <div class="text-danger" *ngIf="frmDonor.controls['id'].touched && frmDonor.controls['id'].errors && frmDonor.controls['id'].errors['required']">שדה חובה</div>
-            </div>
-        </div> -->
 
         <div class="form-group">
-            <div class="form-label">donor name</div>
+            <div class="form-label">Donor Name</div>
             <div>
                 <input type="text" class="form-control" formControlName="name"/>
-                <div class="text-danger" *ngIf="frmDonor.controls['name'].touched && frmDonor.controls['name'].errors && frmDonor.controls['name'].errors['required']">שדה חובה</div>
+                @if (frmDonor.controls['name'].touched && frmDonor.controls['name'].errors?.['required']) {
+                    <div class="text-danger">Required field</div>
+                }
             </div>
         </div>
 
         <div class="form-group">
-            <div class="form-label">email</div>
+            <div class="form-label">Email</div>
             <div>
                 <input type="text" class="form-control" formControlName="email"/>
-                <div class="text-danger" *ngIf="frmDonor.controls['email'].touched && frmDonor.controls['email'].errors && frmDonor.controls['email'].errors['required']">שדה חובה</div>
+                @if (frmDonor.controls['email'].touched && frmDonor.controls['email'].errors?.['required']) {
+                    <div class="text-danger">Required field</div>
+                }
             </div>
         </div>
 
         <div class="form-group">
-            <div class="form-label">phone</div>
+            <div class="form-label">Phone</div>
             <div>
                 <input type="text" class="form-control" formControlName="phone"/>
-                <div class="text-danger" *ngIf="frmDonor.controls['phone'].touched && frmDonor.controls['phone'].errors && frmDonor.controls['phone'].errors['required']">שדה חובה</div>
+                @if (frmDonor.controls['phone'].touched && frmDonor.controls['phone'].errors?.['required']) {
+                    <div class="text-danger">Required field</div>
+                }
             </div>
         </div>
 
-            <div *ngIf="serverError" class="error-message">
+        @if (serverError) {
+            <div class="error-message">
                 ⚠️ {{ serverError }}
             </div>
-            <button type="button" (click)="saveDonor()">Save</button>
+        }
+        
+        <button type="button" (click)="saveDonor()">Save</button>
             <button type="button" (click)="cancel()">Cancel</button>
         </form>
 </div>
+

@@ -3,10 +3,13 @@ import { Login } from './components/login/login/login';
 import { Register } from './components/register/register/register';
 import { GiftsList } from './components/gifts/gifts-list/gifts-list';
 import { DonorsList } from './components/donors/donors-list/donors-list';
+import { Shoppings } from './components/shopping/shoppings/shoppings';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'gifts', pathMatch: 'full' },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
-  { path: 'gifts', component: GiftsList }
+  { path: 'gifts', component: GiftsList },
+  { path: 'donors', component: DonorsList },
+  { path: 'shoppings', component: Shoppings }
 ];

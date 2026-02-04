@@ -1,4 +1,9 @@
 <h3>Gifts List</h3>
+
+@if(errorMsg){
+<div class="alert alert-danger">{{errorMsg}}</div>
+}
+
 <table class="table-bordered">
   <thead>
     <tr>
@@ -11,20 +16,36 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let g of giftsArr; trackBy: trackById">
-      <td>{{ g?.id }}</td>
-      <td>{{ g?.name }}</td>
-      <td>{{ g?.donorName }}</td>
-      <td>{{ g?.cardPrice }}</td>
-      <td>{{ g?.category }}</td>
-      <td>
-        <button (click)="removeGift(g?.id || 0)">❌</button>
-        <button (click)="updateGift(g?.id || 0)">✏️</button>
-      </td>
-    </tr>
+    @for(g of gifts$ | async; track g.id){
+      <tr>
+        <td>{{g.id}}</td>
+        <td>{{g.name}}</td>
+        <td>{{g.donorName}}</td>
+        <td>{{g.cardPrice}}</td>
+        <td>{{g.category}}</td>
+        <td>
+          @if(isManager()){
+            <button (click)="removeGift(g.id)">❌</button>
+            <button (click)="updateGift(g.id)">✏️</button>
+          }
+          <button (click)="addToCart(g.id)">Add to Cart</button>
+        </td>
+      </tr>
+    }
   </tbody>
 </table>
+
+<!-- הצגת הודעת שגיאה -->
+@if (errorMsg) {
+  <div class="error-message">
+    {{ errorMsg }}
+  </div>
+}
+
+@if(isManager()){
 <button (click)="id = 0">➕ Add Gift</button>
-<app-gift *ngIf="id >= 0" [(selectedId)]="id" 
-(selectedIdChange)="onGiftSaved($event)"
-></app-gift>
+}
+
+@if(id >= 0){
+<app-gift [(selectedId)]="id" (selectedIdChange)="onGiftSaved($event)"></app-gift>
+}

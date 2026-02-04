@@ -3,6 +3,8 @@ import { DonorService } from '../../../services/donor-service';
 import { DonorModel } from '../../../models/donor-model';
 import { Donor } from '../donor/donor';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../services/auth-service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-donors-list',
@@ -13,59 +15,64 @@ import { CommonModule } from '@angular/common';
 })
 export class DonorsList {
 
-  donorsArr: DonorModel[] = [];
+  // זריקת שירותים
   donorSrv: DonorService = inject(DonorService);
-  id: number = -1;
+  authSrv: AuthService = inject(AuthService);
+  
+  // משתני רכיב
+  donors$: Observable<DonorModel[]> = this.donorSrv.getAllDonors();
+  id: number = -1; // קוד תורם לעריכה
+  errorMsg: string = ''; // הודעת שגיאה
 
   
   ngOnInit() {
-    this.loadDonors(); // קריאה ראשונית
+    this.loadDonors();
   }
 
   onDonorSaved(newId: number) {
     this.id = newId; 
-    this.loadDonors(); // מרענן את הרשימה מהשרת
+    this.loadDonors();
   }
 
   loadDonors() {
-    this.donorSrv.getAllDonors().subscribe({
-      next: (donors) => this.donorsArr = donors,
-      error: err => {
-        console.error('Load donors error', err);
-        let msg = 'Failed to load donors';
-        if (!err) msg = 'Unknown error';
-        else if (err.status === 0) msg = 'Network error: cannot reach server';
-        else if (err.status === 401 || err.status === 403) msg = 'Not authorized';
-        else if (err?.error) {
-          if (typeof err.error === 'string') msg = err.error;
-          else if (err.error.message) msg = String(err.error.message);
-          else if (err.error.Message) msg = String(err.error.Message);
-          else {
-            try { msg = JSON.stringify(err.error); } catch { msg = String(err.error); }
-          }
-        } else msg = err.message ?? msg;
-
-        console.error('Error message:', msg);
+    this.errorMsg = '';
+    this.donors$ = this.donorSrv.getAllDonors();
+  }
+  
+  addDonor(donor: DonorModel) {
+    this.donorSrv.addDonor(donor).subscribe({
+      next: () => {
+        this.loadDonors();
+      },
+      error: (err) => {
+        this.errorMsg = err.error || 'Error adding donor';
       }
     });
   }
-  addDonor(donor: DonorModel) {
-    this.donorSrv.addDonor(donor).subscribe(() => {
-      this.loadDonors();
-    });
-  }
+  
   removeDonor(donorID: number) {
-    if (confirm('האם אתה בטוח שברצונך למחוק?')) {
-      this.donorSrv.removeDonor(donorID).subscribe(() => {
-        this.loadDonors();
+    if (confirm('Are you sure you want to delete?')) {
+      this.donorSrv.removeDonor(donorID).subscribe({
+        next: () => {
+          this.loadDonors();
+        },
+        error: (err) => {
+          this.errorMsg = err.error || 'Error deleting donor';
+        }
       });
     }
   }
+  
   updateDonor(donorID: number) {
     this.id = donorID;
   }
 
   trackById(index: number, donor: DonorModel): number {
     return donor.id;
+  }
+
+  // בדיקה אם המשתמש מנהל
+  isManager(): boolean {
+    return this.authSrv.isManager();
   }
 }

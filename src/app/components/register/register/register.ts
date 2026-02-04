@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../../services/user-service';
+import { AuthService } from '../../../services/auth-service';
 
 @Component({
   selector: 'app-register',
@@ -12,117 +13,86 @@ import { UserService } from '../../../services/user-service';
   styleUrls: ['./register.scss'],
 })
 export class Register {
-  private userService = inject(UserService);
+  // זריקת שירותים  
+  userService = inject(UserService);
+  authService = inject(AuthService);
+  router = inject(Router);
 
-  // אובייקט שנשלח ל-API
+  // נתוני משתמש
   user = {userName: '', email: '', password: '', phone: ''};
-
-  // אובייקט שמחזיק את השגיאות
-  errors: { [key: string]: string[] } = {userName: [], email: [], password: [], phone: [], general: []};
   
-  // הודעה במידה והרישום הצליח
+  // שגיאות לכל שדה
+  errors: { [key: string]: string[] } = {userName: [], email: [], password: [], phone: [], general: []};
   successMessage: string | null = null;
 
-  // ממפה שגיאות שמגיעות מהשרת למבנה של errors
-  private mapModelStateErrors(errorsArray: any) {
-    try {
-      const list = Array.from(errorsArray);
-      list.forEach((e: any) => {
-        const fieldRaw = e.Field ?? e.field ?? 'general';
+  // מפענח שגיאות מהשרת ומשייך לשדות המתאימים
+  private extractServerErrors(err: any) {
+    this.errors = {userName: [], email: [], password: [], phone: [], general: []};
+    
+    const body = err?.error;
+    
+    // אם אין body - שגיאה כללית
+    if (!body) {
+      this.errors['general'] = [err?.message || 'Registration failed'];
+      return;
+    }
+    
+    // אם השגיאה היא string פשוט
+    if (typeof body === 'string') {
+      this.errors['general'] = [body];
+      return;
+
+
+    }
+    
+    // אם יש מערך Errors מהשרת (ModelState)
+    const modelErrors = body.Errors || body.errors;
+    if (modelErrors && Array.isArray(modelErrors)) {
+      modelErrors.forEach((e: any) => {
+        // מציאת שם השדה
+        const fieldRaw = e.Field || e.field || 'general';
         let field = 'general';
         if (typeof fieldRaw === 'string') {
           const parts = fieldRaw.replace(/^\./, '').split('.');
           const last = parts[parts.length - 1] || 'general';
           field = last.charAt(0).toLowerCase() + last.slice(1);
         }
-        const msg = e.Message ?? e.message ?? String(e);
+        // הוספת ההודעה לשדה המתאים
+        const msg = e.Message || e.message || String(e);
         if (!this.errors[field]) this.errors[field] = [];
         this.errors[field].push(msg);
       });
-    } catch {
-      this.errors['general'] = [JSON.stringify(errorsArray)];
-    }
-  }
-
-  // מפענח שגיאות שרת
-  private extractAndMapServerErrors(err: any) {
-    this.errors = {};
-    if (!err) {
-      this.errors['general'] = ['Unknown error'];
       return;
     }
-
-    if (err.status === 0) {
-      this.errors['general'] = ['Network error: cannot reach server'];
-      return;
-    }
-
-    if (err.status === 401 || err.status === 403) {
-      const body = err.error;
-      if (body && typeof body !== 'string') {
-        const m = body.Message ?? body.message;
-        this.errors['general'] = [m ?? 'Not authorized'];
-      } else this.errors['general'] = [body ?? 'Not authorized'];
-      return;
-    }
-
-    const body = err.error;
-    if (!body) {
-      this.errors['general'] = [err.message ?? 'Registration failed'];
-      return;
-    }
-
-    if (typeof body === 'string') {
-      this.errors['general'] = [body];
-      return;
-    }
-
-    const modelErrors = body.Errors ?? body.errors;
-    if (modelErrors) {
-      this.mapModelStateErrors(modelErrors);
-      return;
-    }
-
+    
+    // אם יש Message בודד
     if (body.Message || body.message) {
-      this.errors['general'] = [String(body.Message ?? body.message)];
+      this.errors['general'] = [body.Message || body.message];
       return;
     }
-    try { this.errors['general'] = [JSON.stringify(body)]; } catch { this.errors['general'] = [String(body)]; }
+    
+    // אחרת - מציג את כל מה שהשרת החזיר
+    this.errors['general'] = [JSON.stringify(body)];
   }
 
+  // רישום משתמש
   register() {
-    // איפוס הודעות שגיאה והצלחה
-    this.errors = { userName: [], email: [], password: [], phone: [], general: [] };
+    this.errors = {userName: [], email: [], password: [], phone: [], general: []};
     this.successMessage = null;
 
-    // בדיקה בסיסית בצד לקוח
-    const clientErrors: { [k: string]: string[] } = {};
-    if (!this.user.userName || !this.user.userName.trim()) clientErrors['userName'] = ['User name is required'];
-    if (!this.user.email || !this.user.email.trim()) clientErrors['email'] = ['Email is required'];
-    if (!this.user.password || !this.user.password.trim()) clientErrors['password'] = ['Password is required'];
-    if (!this.user.phone || !this.user.phone.trim()) clientErrors['phone'] = ['Phone is required'];
-
-    if (Object.keys(clientErrors).length) {
-      this.errors = clientErrors as any;
-      return;// אם יש שגיאות בצד לקוח – עצירה
-    }
-
-    // שליחת בקשת הרשמה ל-API
     this.userService.register(this.user).subscribe({
-        next: () => {
-        // אם ההרשמה הצליחה
-        this.successMessage = 'User registered successfully.';
-        this.user = { userName: '', email: '', password: '', phone: '' };
-        this.errors = { userName: [], email: [], password: [], phone: [], general: [] };
+      next: () => {
+        this.successMessage = 'Registration successful!';
+        // התחברות אוטומטית
+        this.authService.login(this.user.email, this.user.password).subscribe({
+          next: (res) => {
+            this.authService.saveToken(res.token);
+            this.router.navigate(['/gifts']);
+          },
+          error: () => this.router.navigate(['/login'])
+        });
       },
-      // אם יש שגיאה ב־HTTP
-      error: (err) => {
-        //הדפסת השגיאה לקונסול
-        console.log('Registration HTTP error', err);
-        // מפענח שגיאות מהשרת
-        this.extractAndMapServerErrors(err);
-        console.error('Registration errors:', this.errors);
-      }
+      error: (err) => this.extractServerErrors(err)
     });
   }
 }

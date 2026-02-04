@@ -6,6 +6,8 @@
 <br />
 <button (click)="login()">Login</button>
 
-<div *ngIf="errorMsg" style="color:red">{{ errorMsg }}</div>
+@if (errorMsg) {
+  <div style="color:red">{{ errorMsg }}</div>
+}
 
-<p>אין לך חשבון? <a routerLink="/register">הירשם כאן</a></p>
+<p>Don't have an account? <a routerLink="/register">Register here</a></p>

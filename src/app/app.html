@@ -1,2 +1,16 @@
-<app-donors-list></app-donors-list>
+<nav>
+  <a routerLink="/gifts">Gifts</a>
+  
+  @if (isLoggedIn()) {
+    @if (isManager()) {
+      <a routerLink="/donors">Donors</a>
+    }
+    <a routerLink="/shoppings">Cart</a>
+    <button (click)="logout()">Logout</button>
+  } @else {
+    <a routerLink="/login">Login</a>
+    <a routerLink="/register">Register</a>
+  }
+</nav>
+
 <router-outlet />

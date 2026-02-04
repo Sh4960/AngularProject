@@ -33,7 +33,7 @@ export class Donor {
   saveDonor() {
     this.serverError = null;
     if (this.frmDonor.invalid) {
-      this.serverError = 'Form is invalid';
+      this.serverError = 'Please fill in all required fields';
       return;
     }
 
@@ -45,53 +45,27 @@ export class Donor {
 
     obs.subscribe({
       next: () => this.selectedIdChange.emit(-1),
-      error: (err: any) => {
-        console.log('HTTP error', err);
-        if (err?.status === 401 || err?.status === 403) {
-          this.serverError = 'Not authorized (please login).';
-          return;
-        }
-        // הצג את התוכן שה־API החזיר במדויק (string או JSON stringified)
-        const body = err?.error;
-        if (body === undefined || body === null) {
-          this.serverError = err?.message ?? 'Server error';
-        } else if (typeof body === 'string') {
-          this.serverError = body;
-        } else {
-          try {
-            this.serverError = JSON.stringify(body);
-          } catch {
-            this.serverError = String(body);
-          }
-        }
-      }
+      error: (err) => this.serverError = err.error || err.message || 'שגיאה בשמירת תורם'
     });
   }
 
+  // מעדכן טופס כשיד תורם משתנה
   ngOnChanges(c: SimpleChanges){
     if(c['selectedId']){
-      this.serverError = null;
       if(this.selectedId > 0){
+        // עריכת תורם קיים
         this.donorSrv.getDonorById(this.selectedId).subscribe((donor) => {
-          if (donor) this.frmDonor.setValue(donor);
+          this.frmDonor.patchValue(donor);
         });
       } else if(this.selectedId === 0){
-        this.frmDonor.reset({
-          id: 0,
-          name: '',
-          email: '',
-          phone: ''
-        });
+        // תורם חדש
+        this.frmDonor.reset();
       }
     }
   }
 
+  // ביטול עריכה
   cancel() {
-    this.serverError = null;
-    if (this.selectedId > 0) {
-      this.donorSrv.getDonorById(this.selectedId).subscribe((donor) => {
-        if (donor) this.frmDonor.setValue(donor);
-      });
-    }
+    this.selectedIdChange.emit(-1);
   }
 }

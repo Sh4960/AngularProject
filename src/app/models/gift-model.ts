@@ -1,3 +1,5 @@
+import { ShoppingModel } from './shopping/shopping-model';
+
 export class GiftModel {
     id: number = 0;
     name: string = '';
@@ -5,5 +7,6 @@ export class GiftModel {
     cardPrice: number = 10;
     donorId: number = 0;
     donorName: string = '';
-    isRaffled: boolean = false; // Added field with default value
+    isRaffled: boolean = false;
+    shoppings: ShoppingModel[] = []; // רשימת הרכישות של המתנה
 }

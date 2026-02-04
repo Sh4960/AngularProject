@@ -1,0 +1,45 @@
+h1 {
+  // כותרת הרכיב
+  color: #333;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+table {
+  // טבלת המתנות
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  // תאי הטבלה
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: right; // יישור לימין בעברית
+}
+
+th {
+  // כותרות הטבלה
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+button {
+  // כפתורי הפעולות
+  margin: 2px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.error-message {
+  // הודעת שגיאה
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #f8bbd9;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: bold;
+}

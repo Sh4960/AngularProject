@@ -1,0 +1,35 @@
+<div>
+  <h2>Shopping Cart</h2>
+
+  <!-- הצגת שגיאה מהשרת -->
+  @if (errorMsg) {
+    <div style="color:red">{{ errorMsg }}</div>
+  }
+
+  @if (shoppings$ | async; as shoppings) {
+    
+    @if (shoppings.length === 0) {
+      <p>No purchases</p>
+    } @else {
+      
+      @for (shopping of shoppings; track shopping.id) {
+        <div class="shopping-item">
+          <p>Purchase ID: {{ shopping.id }}</p>
+          <p>Gift: {{ shopping.giftId }}</p>
+          <p>Quantity: {{ shopping.quantity }}</p>
+          <p>Name: {{ shopping.userName }}</p>
+          <p>Email: {{ shopping.email }}</p>
+          <p>Phone: {{ shopping.phone }}</p>
+          
+          <button (click)="confirmShopping(shopping.id)">Confirm Purchase</button>
+          <button (click)="removeShopping(shopping.id)">Delete</button>
+        </div>
+      }
+      
+    }
+    
+  } @else {
+    <p>Loading...</p>
+  }
+
+</div>

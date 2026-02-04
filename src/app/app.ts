@@ -1,14 +1,30 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { DonorsList } from './components/donors/donors-list/donors-list';
+import { Component, inject } from '@angular/core';
+import { Router, RouterOutlet, RouterLink } from '@angular/router';
+import { AuthService } from './services/auth-service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet,DonorsList],
+  imports: [RouterOutlet, RouterLink, CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('project');
+  
+  router = inject(Router);
+  authSrv = inject(AuthService);
+
+  isLoggedIn(): boolean {
+    return this.authSrv.isLoggedIn();
+  }
+
+  isManager(): boolean {
+    return this.authSrv.isManager();
+  }
+
+  logout() {
+    this.authSrv.logout();
+    this.router.navigate(['/gifts']);
+  }
 }
