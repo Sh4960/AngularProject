@@ -27,9 +27,8 @@
           @if(isManager()){
             <button (click)="removeGift(g.id)">❌</button>
             <button (click)="updateGift(g.id)">✏️</button>
-          } @else {
-            <button (click)="addToCart(g.id)">Add to Cart</button>
           }
+          <button (click)="addToCart(g.id)">Add to Cart</button>
         </td>
       </tr>
     }

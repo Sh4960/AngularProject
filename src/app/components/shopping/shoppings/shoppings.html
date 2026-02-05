@@ -1,44 +1,67 @@
 <div>
-  <h2>Shopping Cart</h2>
+  <h2>עגלת קניות</h2>
 
   @if (errorMsg) {
-    <div style="color:red">{{ errorMsg }}</div>
+    <div style="color:red; padding: 10px; border: 1px solid red; border-radius: 4px;">{{ errorMsg }}</div>
   }
 
   @if (shoppings$ | async; as shoppings) {
     
     @if (shoppings.length === 0) {
-      <p>No purchases</p>
+      <p>אין רכישות בעגלה</p>
     } @else {
       
       <table class="table-bordered">
         <thead>
           <tr>
-            <th>Gift Name</th>
-            <th>Card Price</th>
-            <th>Quantity</th>
-            <th>Total</th>
-            <th>Actions</th>
+            <th>שם מתנה</th>
+            <th>מחיר כרטיס</th>
+            <th>כמות</th>
+            <th>סה"כ</th>
+            <th>סטטוס</th>
+            <th>פעולות</th>
           </tr>
         </thead>
         <tbody>
           @for (shopping of shoppings; track shopping.id) {
-            <tr>
-              <td>{{ shopping.giftName }}</td>
-              <td>{{ shopping.cardPrice }}</td>
-              <td>{{ shopping.quantity }}</td>
-              <td>{{ shopping.cardPrice * shopping.quantity }}</td>
-              <td>
-                <button (click)="confirmShopping(shopping)">✅</button>
-                <button (click)="removeShopping(shopping)">❌</button>
-              </td>
-            </tr>
+            <!-- טיוטות - רגיל -->
+            @if (shopping.isDraft !== false) {
+              <tr [style.opacity]="isPaymentProcessing ? '0.5' : '1'">
+                <td>{{ shopping.giftName }}</td>
+                <td>{{ shopping.cardPrice }}</td>
+                <td>
+                  <button (click)="decreaseQuantity(shopping)" class="btn-qty" [disabled]="isPaymentProcessing">-</button>
+                  {{ shopping.quantity }}
+                  <button (click)="increaseQuantity(shopping)" class="btn-qty" [disabled]="isPaymentProcessing">+</button>
+                </td>
+                <td>{{ shopping.cardPrice * shopping.quantity }}</td>
+                <td style="color: green;">טיוטה</td>
+                <td>
+                  <button (click)="removeShopping(shopping)" class="btn-delete" [disabled]="isPaymentProcessing">מחק</button>
+                </td>
+              </tr>
+            }
+            
+            <!-- רכישות שאושרו - disabled -->
+            @if (shopping.isDraft === false) {
+              <tr [style.opacity]="'0.6'" [style.backgroundColor]="'#f0f0f0'">
+                <td>{{ shopping.giftName }}</td>
+                <td>{{ shopping.cardPrice }}</td>
+                <td style="text-align: center;">{{ shopping.quantity }}</td>
+                <td>{{ shopping.cardPrice * shopping.quantity }}</td>
+                <td style="color: gray;">אושרה</td>
+                <td style="color: gray;">-</td>
+              </tr>
+            }
           }
         </tbody>
       </table>
 
       <div class="total-section">
-        <h3>Total to Pay: {{ getTotalPrice(shoppings) }}</h3>
+        <h3>סה"כ לתשלום: {{ getTotalPrice(getDraftsOnly(shoppings)) }}₪</h3>
+        <button (click)="paymentAll(shoppings)" class="btn-payment" [disabled]="isPaymentProcessing || getDraftsOnly(shoppings).length === 0">
+          {{ isPaymentProcessing ? 'מעבד תשלום...' : 'בצע תשלום' }}
+        </button>
       </div>
       
     }

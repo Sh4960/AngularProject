@@ -1,0 +1,63 @@
+<div class="profile-container">
+  <h3>האזור האישי שלי</h3>
+  
+  @if(errorMsg){
+    <div class="error-message">{{errorMsg}}</div>
+  }
+  
+  @if(successMsg){
+    <div class="success-message">{{successMsg}}</div>
+  }
+  
+  @if(userId > 0) {
+    @if(!isEditing) {
+      <div class="profile-display">
+        <div class="info-row">
+          <label>שם משתמש</label>
+          <span>{{userName}}</span>
+        </div>
+        <div class="info-row">
+          <label>דוא"ל</label>
+          <span>{{userEmail}}</span>
+        </div>
+        <div class="info-row">
+          <label>טלפון</label>
+          <span>{{phone}}</span>
+        </div>
+        <button type="button" (click)="isEditing = true" class="btn-edit">עדכן פרטים</button>
+      </div>
+    } @else {
+      <form (ngSubmit)="updateProfile()" #profileForm="ngForm">
+        <div class="form-group">
+          <label>שם משתמש</label>
+          <input type="text" [(ngModel)]="userName" name="userName" required>
+        </div>
+        
+        <div class="form-group">
+          <label>דוא"ל</label>
+          <input type="email" [(ngModel)]="userEmail" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label>טלפון</label>
+          <input type="tel" [(ngModel)]="phone" name="phone" required>
+        </div>
+
+        <div class="form-group">
+          <label>סיסמה חדשה (אופציונלי):</label>
+          <input type="password" [(ngModel)]="newPassword" name="newPassword">
+        </div>
+        
+        <div class="form-group">
+          <label>אישור סיסמה (אופציונלי):</label>
+          <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword">
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" [disabled]="!profileForm.valid" class="btn-submit">שמור שינויים</button>
+          <button type="button" (click)="cancelEdit()" class="btn-cancel">בטל</button>
+        </div>
+      </form>
+    }
+  }
+</div>

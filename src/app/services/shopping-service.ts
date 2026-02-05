@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { ShoppingModel } from '../models/shopping/shopping-model';
-import { ShoppingCreateModel } from '../models/shopping/ShoppingCreate -model';
+import { ShoppingCreateModel } from '../models/shopping/ShoppingCreate-model';
 import { AuthService } from './auth-service';
 
 @Injectable({
@@ -13,28 +13,53 @@ export class ShoppingService {
   httpClient: HttpClient = inject(HttpClient);
   authService: AuthService = inject(AuthService);
   
+  // קבלת כל הרכישות
   getAllShoppings() {
-      return this.httpClient.get<ShoppingModel[]>(this.BASE_URL, { headers: this.authService.getAuthHeaders() });
-  } 
-
-  addShopping(s:ShoppingCreateModel){
-      return this.httpClient.post(this.BASE_URL, s, { headers: this.authService.getAuthHeaders(), responseType: 'text' });
+    return this.httpClient.get<ShoppingModel[]>(this.BASE_URL, { 
+      headers: this.authService.getAuthHeaders() 
+    });
   }
 
-  updateShopping(s: ShoppingModel){
-      return this.httpClient.put<ShoppingModel>(`${this.BASE_URL}/${s.id}`, s, { headers: this.authService.getAuthHeaders() });
+  // הוספת רכישה חדשה
+  addShopping(s: ShoppingCreateModel) {
+    return this.httpClient.post(this.BASE_URL, s, { 
+      headers: this.authService.getAuthHeaders(), 
+      responseType: 'text' 
+    });
   }
 
-  getShoppingById(shoppingId: number){
-      return this.httpClient.get<ShoppingCreateModel>(this.BASE_URL + '/'+ shoppingId, { headers: this.authService.getAuthHeaders() });
+  // עדכון רכישה
+  updateShopping(s: ShoppingModel) {
+    console.log('📤 Sending PUT request with shopping:', s);
+    return this.httpClient.put(
+      `${this.BASE_URL}/${s.id}`, 
+      s, 
+      { 
+        headers: this.authService.getAuthHeaders(),
+        responseType: 'text'
+      } 
+    );
   }
 
-  removeShopping(shoppingId: number){
-      return this.httpClient.delete<void>(`${this.BASE_URL}/${shoppingId}`, { headers: this.authService.getAuthHeaders() });
+  // קבלת רכישה לפי ID
+  getShoppingById(shoppingId: number) {
+    return this.httpClient.get<ShoppingCreateModel>(`${this.BASE_URL}/${shoppingId}`, { 
+      headers: this.authService.getAuthHeaders() 
+    });
   }
 
-  // פונקציה לאישור רכישה - מעבר מטיוטא לרכישה מאושרת
+  // מחיקת רכישה
+  removeShopping(shoppingId: number) {
+    return this.httpClient.delete<void>(`${this.BASE_URL}/${shoppingId}`, { 
+      headers: this.authService.getAuthHeaders() 
+    });
+  }
+
+  // אישור רכישה
   confirmShopping(shoppingId: number) {
-      return this.httpClient.post(`${this.BASE_URL}/${shoppingId}/confirm`, {}, { headers: this.authService.getAuthHeaders(), responseType: 'text' });
+    return this.httpClient.post(`${this.BASE_URL}/${shoppingId}/confirm`, {}, { 
+      headers: this.authService.getAuthHeaders(), 
+      responseType: 'text' 
+    });
   }
 }

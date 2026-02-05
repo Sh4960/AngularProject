@@ -24,5 +24,15 @@ export class UserService {
   getAllUsers(): Observable<any> {
     return this.http.get(this.BASE_URL, this.authHeaders());
   }
+
+  // עדכון פרופיל משתמש
+  updateProfile(userId: number, user: any): Observable<any> {
+    return this.http.put(`${this.BASE_URL}/${userId}`, user, this.authHeaders());
+  }
+
+  // קבלת פרטי משתמש לפי ID
+  getUserById(userId: number): Observable<any> {
+    return this.http.get(`${this.BASE_URL}/${userId}`, this.authHeaders());
+  }
 }
   
