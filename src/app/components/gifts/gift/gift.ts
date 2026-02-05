@@ -2,6 +2,7 @@ import { Component, EventEmitter, inject, Input, Output, SimpleChanges } from '@
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GiftService } from '../../../services/gift-service';
 import { GiftModel } from '../../../models/gift-model';
+import { GiftDTO } from '../../../models/gift-dto-model';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -41,7 +42,8 @@ export class Gift {
     }
 
     // יצירת אובייקט מתנה לשליחה לשרת
-    const giftDTO: any = {
+
+    const giftDTO: GiftDTO = {
       id: this.frmGift.value.id,
       name: this.frmGift.value.name,
       donorName: this.frmGift.value.donorName,

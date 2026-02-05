@@ -4,6 +4,9 @@ export class ShoppingModel {
     giftId: number = 0;
     quantity: number = 0;
     isDraft: boolean = true;
+    userName: string = '';
+    email: string = '';
+    phone: string = '';
     giftName: string = '';
     cardPrice: number = 0;
   }

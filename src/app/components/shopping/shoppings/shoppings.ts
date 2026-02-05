@@ -1,15 +1,20 @@
 import { Component, inject } from '@angular/core';
 import { ShoppingService } from '../../../services/shopping-service';
 import { GiftService } from '../../../services/gift-service';
+
+import { ShoppingSortDTO, ShoppingSortBy } from '../../../models/shopping-sort.model';
 import { AuthService } from '../../../services/auth-service';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
+import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-shoppings',
   standalone: true,
-  imports: [CommonModule],
+
+  imports: [CommonModule, FormsModule],
   templateUrl: './shoppings.html',
   styleUrl: './shoppings.scss'
 })
@@ -23,6 +28,15 @@ export class Shoppings {
   shoppings$: Observable<any[]> = of([]);
   errorMsg: string = '';
   isPaymentProcessing: boolean = false;
+
+  // מיון
+  sort: ShoppingSortDTO = {
+    sortBy: undefined,
+    desc: true
+  };
+
+  // Enum for template access
+  ShoppingSortBy = ShoppingSortBy;
 
   ngOnInit() {
     this.refreshShoppings();
@@ -234,4 +248,68 @@ export class Shoppings {
   getDraftsOnly(shoppings: any[]): any[] {
     return shoppings.filter((s: any) => s.isDraft !== false);
   }
+ 
+  processShoppings(shoppings: any[]) {
+    let filteredShoppings = shoppings;
+    if (!this.authSrv.isManager()) {
+      const currentUserId = this.authSrv.getUserIdFromToken();
+      filteredShoppings = shoppings.filter(shopping => shopping.userId === currentUserId);
+    }
+
+    // ✅ קיבוץ רכישות של אותה מתנה לפי userId ו-giftId
+    const groupedShoppings = filteredShoppings.reduce((acc, shopping) => {
+      const key = `${shopping.userId}-${shopping.giftId}`;
+      if (acc[key]) {
+        acc[key].quantity += shopping.quantity;
+        acc[key].totalPrice = acc[key].cardPrice * acc[key].quantity;
+        // שמירת כל ה-IDs לצורך מחיקה
+        acc[key].allIds = [...(acc[key].allIds || [shopping.id]), shopping.id];
+      } else {
+        acc[key] = {
+          ...shopping,
+          totalPrice: shopping.cardPrice * shopping.quantity,
+          allIds: [shopping.id] // שמירה של כל ה-IDs
+        };
+      }
+      return acc;
+    }, {} as any);
+
+    const groupedArray = Object.values(groupedShoppings);
+    this.shoppings$ = of(groupedArray);
+  }
+
+  applySort() {
+    this.refreshShoppings();
+  }
+
+  clearSort() {
+    this.sort = { sortBy: undefined, desc: true };
+    this.refreshShoppings();
+  }
+  
+  confirmShopping(shoppingItem: any) {
+    this.errorMsg = '';
+    // אישור כל הרכישות של הפריט הזה
+    const allIds = shoppingItem.allIds || [shoppingItem.id];
+    
+    // נעבור על כל ה-IDs ונאשר אותם
+    let completedRequests = 0;
+    allIds.forEach((id: number) => {
+      this.shoppingSrv.confirmShopping(id).subscribe({
+        next: () => {
+          completedRequests++;
+          if (completedRequests === allIds.length) {
+            this.refreshShoppings();
+          }
+        },
+        error: (err) => {
+          this.errorMsg = err.error || 'Error confirming purchase';
+        }
+      });
+    });
+  }
+  
+ 
+
+ 
 }

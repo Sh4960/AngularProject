@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { DonorModel } from '../models/donor-model';
-import { HttpClient } from '@angular/common/http';
+
+import { DonorFilterDTO } from '../models/donor-filter.model';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth-service';
 
 @Injectable({ providedIn: 'root' })
@@ -18,10 +20,24 @@ export class DonorService {
       return this.httpClient.get<DonorModel[]>(this.BASE_URL, { headers: this.authService.getAuthHeaders() });
   }
 
+  // קבלת תורמים מסוננים
+  getFilteredDonors(filter: DonorFilterDTO) {
+      let params = new HttpParams();
+      if (filter.name) params = params.set('name', filter.name);
+      if (filter.email) params = params.set('email', filter.email);
+      if (filter.giftName) params = params.set('giftName', filter.giftName);
+      
+      return this.httpClient.get<DonorModel[]>(`${this.BASE_URL}/filter`, { 
+          headers: this.authService.getAuthHeaders(),
+          params: params
+      });
+  }
+
   // הוספת תורם חדש
   addDonor(d: any){
       return this.httpClient.post(this.BASE_URL, d, { headers: this.authService.getAuthHeaders(), responseType: 'text' });
   }
+
 
   updateDonor(d: any){
       return this.httpClient.put(`${this.BASE_URL}/${d.id}`, d, { headers: this.authService.getAuthHeaders(), responseType: 'text' });

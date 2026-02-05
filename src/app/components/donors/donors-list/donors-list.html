@@ -5,6 +5,33 @@
 }
 
 @if(isManager()){
+
+
+<div class="filter-section">
+  <h4>Filter Donors</h4>
+  <div class="filter-inputs">
+    <input 
+      type="text" 
+      [(ngModel)]="filter.name" 
+      placeholder="Filter by Name"
+      (input)="applyFilters()"
+    />
+    <input 
+      type="text" 
+      [(ngModel)]="filter.email" 
+      placeholder="Filter by Email"
+      (input)="applyFilters()"
+    />
+    <input 
+      type="text" 
+      [(ngModel)]="filter.giftName" 
+      placeholder="Filter by Gift Name"
+      (input)="applyFilters()"
+    />
+    <button (click)="clearFilters()">Clear Filters</button>
+  </div>
+</div>
+
 <table class="table-bordered">
   <thead>
     <tr>

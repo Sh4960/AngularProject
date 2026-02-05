@@ -1,40 +1,75 @@
 import { Component, inject } from '@angular/core';
 import { GiftService } from '../../../services/gift-service';
 import { GiftModel } from '../../../models/gift-model';
+import { GiftFilterDTO, GiftSortBy } from '../../../models/gift-filter.model';
+import { RaffleResultDTO } from '../../../models/raffle-result-model';
+import { RaffleReportDTO } from '../../../models/raffle-report-model';
 import { Gift } from '../gift/gift';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ShoppingService } from '../../../services/shopping-service';
-import { ShoppingCreateModel } from '../../../models/shopping/ShoppingCreate-model';
+import { ShoppingCreateModel } from '../../../models/shopping/ShoppingCreate -model';
 import { AuthService } from '../../../services/auth-service';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-gifts-list',
   standalone: true,
-  imports: [Gift, CommonModule],
+  imports: [Gift, CommonModule, FormsModule],
   templateUrl: './gifts-list.html',
   styleUrls: ['./gifts-list.scss'],
 })
-export class GiftsList {
+
+export class GiftsList implements OnInit {
   giftSrv = inject(GiftService);
   shoppingSrv = inject(ShoppingService);
   authSrv = inject(AuthService);
   router = inject(Router);
 
-  gifts$ = this.giftSrv.getAllGifts();
-  id: number = -1;
-  errorMsg: string = '';
+   // משתני רכיב
+  gifts$: Observable<GiftModel[]> = this.giftSrv.getAllGifts();
+  id: number = -1; // קוד מתנה לעריכה
+  errorMsg: string = ''; // הודעת שגיאה
+  raffleResult: RaffleResultDTO[] = []; // תוצאות הגרלה אחרונות
+  
+  // מסננים ומיון
+  filter: GiftFilterDTO = {
+    giftName: '',
+    donorName: '',
+    category: '',
+    sortBy: undefined,
+    desc: false
+  };
+
+  // Enum for template access
+  GiftSortBy = GiftSortBy;
+  
+  private readonly STORAGE_KEY = 'raffleResults';
+
+  ngOnInit() {
+    // טעינת תוצאות הגרלה מ-localStorage
+    this.loadRaffleResultsFromStorage();
+  }
+
+  // טעינת תוצאות הגרלה מ-localStorage
+  private loadRaffleResultsFromStorage() {
+    try {
+      const stored = localStorage.getItem(this.STORAGE_KEY);
+      if (stored) {
+        this.raffleResult = JSON.parse(stored);
+           }
+    } catch (error) {
+      console.error('Error loading raffle results from storage:', error);
+    }
+  }
 
   // טעינת מתנות מהשרת
   loadGifts() {
     this.gifts$ = this.giftSrv.getAllGifts();
   }
 
-  // אירוע בשמירת מתנה
-  onGiftSaved(newId: number) {
-    this.id = newId;
-    this.loadGifts();
-  }
+
 
   // הוספת מתנה לסל קניות
   addToCart(giftId: number) {
@@ -100,6 +135,7 @@ export class GiftsList {
       error: (err) => {
         console.error('❌ Error fetching shoppings:', err);
         this.errorMsg = 'שגיאה בטעינת הרכישות: ' + err.error;
+
       }
     });
   }
@@ -128,6 +164,62 @@ export class GiftsList {
     
     this.errorMsg = errorMessage;
   }
+
+ 
+
+
+  // שמירת תוצאות הגרלה ב-localStorage
+  private saveRaffleResultsToStorage() {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.raffleResult));
+    } catch (error) {
+      console.error('Error saving raffle results to storage:', error);
+    }
+  }
+
+  // טעינת רשימת מתנות מהשרת
+  
+
+  applyFilters() {
+    this.errorMsg = '';
+    const filterDTO: GiftFilterDTO = {};
+    
+    if (this.filter.giftName?.trim()) filterDTO.giftName = this.filter.giftName.trim();
+    if (this.filter.donorName?.trim()) filterDTO.donorName = this.filter.donorName.trim();
+    if (this.filter.category?.trim()) filterDTO.category = this.filter.category.trim();
+    if (this.filter.sortBy) {
+      filterDTO.sortBy = this.filter.sortBy;
+      filterDTO.desc = this.filter.desc;
+    }
+
+    // אם יש לפחות סינון או מיון אחד, השתמש ב-API מסונן
+    if (Object.keys(filterDTO).length > 0) {
+      this.gifts$ = this.giftSrv.getFilteredGifts(filterDTO);
+    } else {
+      // אחרת, הצג את כל המתנות
+      this.loadGifts();
+    }
+  }
+
+  clearFilters() {
+    this.filter = { 
+      giftName: '', 
+      donorName: '', 
+      category: '', 
+      sortBy: undefined, 
+      desc: false 
+    };
+    this.loadGifts();
+  }
+
+  // אירוע בשמירת מתנה
+  onGiftSaved(newId: number) {
+    this.id = newId;
+    this.loadGifts();
+  }
+
+  // הוספת מתנה לסל קניות
+
 
   // הוספת מתנה חדשה
   addGift(gift: GiftModel) {
@@ -162,4 +254,94 @@ export class GiftsList {
   isManager(): boolean {
     return this.authSrv.isManager();
   }
+
+  raffleGift(giftId: number) {
+    this.giftSrv.raffleGift(giftId).subscribe({
+      next: (res: RaffleResultDTO) => {
+        alert(`🎉 הזוכה במתנה "${res.giftName}" הוא: ${res.winnerUserName}`);
+         this.raffleResult = [
+        ...this.raffleResult?.filter(r => r.giftId !== res.giftId) || [],
+        res
+      ];
+        this.saveRaffleResultsToStorage();
+        this.loadGifts();
+      },
+      error: (err) => {
+        this.errorMsg = err.error || 'שגיאה בביצוע ההגרלה';
+      }
+    });
+  }
+  
+  // downloadPdf() {
+  //   this.giftSrv.getRaffleWinnersPdf().subscribe({
+  //     next: (blob: Blob) => {
+  //       const url = window.URL.createObjectURL(blob);
+  //       window.open(url);
+  //     },
+  //     error: (err) => {
+  //       console.error('PDF Download Error:', err);
+  //       if (err.status === 401) {
+  //         this.errorMsg = 'אין הרשאה להורדת דוח - יש להתחבר כמנהל';
+  //       } else if (err.status === 0) {
+  //         this.errorMsg = 'שגיאת תקשורת עם השרת - ודא ש-CORS מוגדר';
+  //       } else {
+  //         this.errorMsg = `שגיאה בהורדת דוח הזוכים (${err.status})`;
+  //       }
+  //     }
+  //   });
+  // }
+
+  downloadPdf() {
+  this.giftSrv.getRaffleWinnersPdf()
+    // .pipe(takeUntil(this.destroy$))  // ⬅️ 1. Prevent memory leak
+    .subscribe({
+      next: (blob: Blob) => {
+        // 2. Create temporary URL for the blob
+        const url = window.URL.createObjectURL(blob);
+        
+        // 3. Create invisible download link
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `raffle-winners-${new Date().toISOString().split('T')[0]}.pdf`;
+        
+        // 4. Trigger download
+        document.body.appendChild(a);
+        a.click();
+        
+        // 5. Clean up
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);  // ⬅️ Free memory!
+      }
+    });
+}
+  raffleAll() {
+    this.giftSrv.raffleAllGifts().subscribe({
+      next: (report: RaffleReportDTO) => {
+        console.log('Raffle Report:', report);
+        if (report && report.results && report.results.length > 0) {
+          let message = `בוצעה הגרלה ל־${report.results.length} מתנות\nסך הכנסות: ₪${report.totalIncome}\n\nזוכים:\n`;
+          report.results.forEach(result => {
+            message += `${result.giftName}: ${result.winnerUserName}\n`;
+          });
+          alert(message);
+          this.raffleResult = report.results;
+          this.saveRaffleResultsToStorage();
+        } else {
+          alert('אין מתנות זמינות להגרלה (כבר הוגרלה או אין קניות)');
+        }
+        this.loadGifts();
+      },
+      error: (err) => {
+        console.error('Raffle Error:', err);
+        this.errorMsg = err.error || 'שגיאה בביצוע ההגרלה לכל המתנות';
+        alert(this.errorMsg);
+      }
+    });
+  }
+  
+  getWinnerName(giftId: number): string | null {
+    const found = this.raffleResult.find(r => r.giftId === giftId);
+    return found ? found.winnerUserName : null;
+  }
+  
 }

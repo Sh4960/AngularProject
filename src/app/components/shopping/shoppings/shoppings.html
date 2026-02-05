@@ -1,25 +1,51 @@
 <div>
-  <h2>עגלת קניות</h2>
+  
 
   @if (errorMsg) {
     <div style="color:red; padding: 10px; border: 1px solid red; border-radius: 4px;">{{ errorMsg }}</div>
   }
+  <h2>Shopping Cart</h2>
+
+ 
+
+  <div class="sort-section">
+    <h4>Sort Purchases</h4>
+    <div class="sort-inputs">
+      <select [(ngModel)]="sort.sortBy" (change)="applySort()">
+        <option [ngValue]="undefined">No Sorting</option>
+        <option [ngValue]="ShoppingSortBy.Price">Sort by Price</option>
+        <option [ngValue]="ShoppingSortBy.Popularity">Sort by Popularity</option>
+      </select>
+      
+      <label>
+        <input 
+          type="checkbox" 
+          [(ngModel)]="sort.desc" 
+          (change)="applySort()"
+          [disabled]="!sort.sortBy"
+        />
+        Descending
+      </label>
+      
+      <button (click)="clearSort()">Clear Sorting</button>
+    </div>
+  </div>
 
   @if (shoppings$ | async; as shoppings) {
     
     @if (shoppings.length === 0) {
-      <p>אין רכישות בעגלה</p>
+      <p>No purchases</p>
+>>>>>>> Stashed changes
     } @else {
       
       <table class="table-bordered">
         <thead>
           <tr>
-            <th>שם מתנה</th>
-            <th>מחיר כרטיס</th>
-            <th>כמות</th>
-            <th>סה"כ</th>
-            <th>סטטוס</th>
-            <th>פעולות</th>
+            <th>Gift Name</th>
+            <th>Card Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -53,6 +79,7 @@
                 <td style="color: gray;">-</td>
               </tr>
             }
+
           }
         </tbody>
       </table>
@@ -62,6 +89,7 @@
         <button (click)="paymentAll(shoppings)" class="btn-payment" [disabled]="isPaymentProcessing || getDraftsOnly(shoppings).length === 0">
           {{ isPaymentProcessing ? 'מעבד תשלום...' : 'בצע תשלום' }}
         </button>
+
       </div>
       
     }

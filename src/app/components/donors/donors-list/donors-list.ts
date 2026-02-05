@@ -1,15 +1,20 @@
 import { Component, inject } from '@angular/core';
 import { DonorService } from '../../../services/donor-service';
 import { DonorModel } from '../../../models/donor-model';
+import { DonorFilterDTO } from '../../../models/donor-filter.model';
 import { Donor } from '../donor/donor';
 import { CommonModule } from '@angular/common';
+<<<<<<< Updated upstream
+=======
+import { FormsModule } from '@angular/forms';
+>>>>>>> Stashed changes
 import { AuthService } from '../../../services/auth-service';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-donors-list',
   standalone: true,
-  imports: [Donor,CommonModule],
+  imports: [Donor, CommonModule, FormsModule],
   templateUrl: './donors-list.html',
   styleUrl: './donors-list.scss'
 })
@@ -24,6 +29,15 @@ export class DonorsList {
   id: number = -1; // קוד תורם לעריכה
   errorMsg: string = ''; // הודעת שגיאה
 
+
+  // מסננים
+  filter: DonorFilterDTO = {
+    name: '',
+    email: '',
+    giftName: ''
+  };
+
+
   
   ngOnInit() {
     this.loadDonors();
@@ -37,6 +51,29 @@ export class DonorsList {
   loadDonors() {
     this.errorMsg = '';
     this.donors$ = this.donorSrv.getAllDonors();
+  }
+
+
+  applyFilters() {
+    this.errorMsg = '';
+    const filterDTO: DonorFilterDTO = {};
+    
+    if (this.filter.name?.trim()) filterDTO.name = this.filter.name.trim();
+    if (this.filter.email?.trim()) filterDTO.email = this.filter.email.trim();
+    if (this.filter.giftName?.trim()) filterDTO.giftName = this.filter.giftName.trim();
+
+    // אם יש לפחות סינון אחד, השתמש ב-API מסונן
+    if (Object.keys(filterDTO).length > 0) {
+      this.donors$ = this.donorSrv.getFilteredDonors(filterDTO);
+    } else {
+      // אחרת, הצג את כל התורמים
+      this.loadDonors();
+    }
+  }
+
+  clearFilters() {
+    this.filter = { name: '', email: '', giftName: '' };
+    this.loadDonors();
   }
   
   addDonor(donor: DonorModel) {

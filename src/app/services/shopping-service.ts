@@ -1,7 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { ShoppingModel } from '../models/shopping/shopping-model';
-import { ShoppingCreateModel } from '../models/shopping/ShoppingCreate-model';
+import { ShoppingCreateModel } from '../models/shopping/ShoppingCreate -model';
+import { ShoppingSortDTO } from '../models/shopping-sort.model';
 import { AuthService } from './auth-service';
 
 @Injectable({
@@ -61,5 +63,19 @@ export class ShoppingService {
       headers: this.authService.getAuthHeaders(), 
       responseType: 'text' 
     });
-  }
+    }  
+
+  // קבלת רכישות ממוינות
+  getSortedShoppings(sort: ShoppingSortDTO) {
+      let params = new HttpParams();
+      if (sort.sortBy) params = params.set('sortBy', sort.sortBy.toString());
+      if (sort.desc !== undefined) params = params.set('desc', sort.desc.toString());
+      
+      return this.httpClient.get<ShoppingModel[]>(`${this.BASE_URL}/sorted`, { 
+          headers: this.authService.getAuthHeaders(),
+          params: params
+      });
+  } 
+
+
 }

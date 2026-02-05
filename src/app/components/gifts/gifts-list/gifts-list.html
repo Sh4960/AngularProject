@@ -4,6 +4,51 @@
 <div class="alert alert-danger">{{errorMsg}}</div>
 }
 
+<<<<<<< Updated upstream
+=======
+<div class="filter-section">
+  <h4>Filter & Sort Gifts</h4>
+  <div class="filter-inputs">
+    <input 
+      type="text" 
+      [(ngModel)]="filter.giftName" 
+      placeholder="Filter by Gift Name"
+      (input)="applyFilters()"
+    />
+    <input 
+      type="text" 
+      [(ngModel)]="filter.donorName" 
+      placeholder="Filter by Donor Name"
+      (input)="applyFilters()"
+    />
+    <input 
+      type="text" 
+      [(ngModel)]="filter.category" 
+      placeholder="Filter by Category"
+      (input)="applyFilters()"
+    />
+    
+    <select [(ngModel)]="filter.sortBy" (change)="applyFilters()">
+      <option [ngValue]="undefined">No Sorting</option>
+      <option [ngValue]="GiftSortBy.Price">Sort by Price</option>
+      <option [ngValue]="GiftSortBy.PurchasesCount">Sort by Purchases Count</option>
+    </select>
+    
+    <label>
+      <input 
+        type="checkbox" 
+        [(ngModel)]="filter.desc" 
+        (change)="applyFilters()"
+        [disabled]="!filter.sortBy"
+      />
+      Descending
+    </label>
+    
+    <button (click)="clearFilters()">Clear Filters</button>
+  </div>
+</div>
+
+>>>>>>> Stashed changes
 <table class="table-bordered">
   <thead>
     <tr>
@@ -24,12 +69,26 @@
         <td>{{g.cardPrice}}</td>
         <td>{{g.category}}</td>
         <td>
-          @if(isManager()){
+
+          @if (isManager()) {
             <button (click)="removeGift(g.id)">❌</button>
             <button (click)="updateGift(g.id)">✏️</button>
+            <button (click)="raffleGift(g.id)" [disabled]="g.isRaffled">
+              🎲 בצע הגרלה
+            </button>
+          } @else {
+            @if (g.isRaffled) {
+              @if (getWinnerName(g.id)) {
+                <div class="winner-label">🏆 Winner: {{ getWinnerName(g.id) }}</div>
+              } @else {
+                <div class="raffled-label">✅ הוגרלה</div>
+              }
+            } @else {
+              <button (click)="addToCart(g.id)">Add to Cart</button>
+            }
           }
-          <button (click)="addToCart(g.id)">Add to Cart</button>
         </td>
+
       </tr>
     }
   </tbody>
@@ -44,6 +103,14 @@
 
 @if(isManager()){
 <button (click)="id = 0">➕ Add Gift</button>
+}
+
+\
+@if(isManager()){
+  <button (click)="downloadPdf()">📄 הפקת דוח זוכים</button>
+}
+@if(isManager()){
+  <button (click)="raffleAll()">🎲 בצע הגרלה לכל המתנות</button>
 }
 
 @if(id >= 0){
