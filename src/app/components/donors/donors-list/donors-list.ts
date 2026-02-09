@@ -4,10 +4,8 @@ import { DonorModel } from '../../../models/donor-model';
 import { DonorFilterDTO } from '../../../models/donor-filter.model';
 import { Donor } from '../donor/donor';
 import { CommonModule } from '@angular/common';
-<<<<<<< Updated upstream
-=======
+
 import { FormsModule } from '@angular/forms';
->>>>>>> Stashed changes
 import { AuthService } from '../../../services/auth-service';
 import { Observable } from 'rxjs';
 

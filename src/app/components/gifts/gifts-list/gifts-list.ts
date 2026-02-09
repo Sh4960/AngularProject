@@ -21,7 +21,7 @@ import { Observable } from 'rxjs';
   styleUrls: ['./gifts-list.scss'],
 })
 
-export class GiftsList implements OnInit {
+export class GiftsList {
   giftSrv = inject(GiftService);
   shoppingSrv = inject(ShoppingService);
   authSrv = inject(AuthService);
