@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { DonorService } from '../../../services/donor-service';
 import { DonorModel } from '../../../models/donor-model';
+import { DonorDTO } from '../../../models/donor-dto-model';
 import { DonorFilterDTO } from '../../../models/donor-filter.model';
 import { Donor } from '../donor/donor';
 import { CommonModule } from '@angular/common';
@@ -23,7 +24,7 @@ export class DonorsList {
   authSrv: AuthService = inject(AuthService);
   
   // משתני רכיב
-  donors$: Observable<DonorModel[]> = this.donorSrv.getAllDonors();
+  donors$: Observable<DonorDTO[]> = this.donorSrv.getAllDonors();
   id: number = -1; // קוד תורם לעריכה
   errorMsg: string = ''; // הודעת שגיאה
 
@@ -92,17 +93,35 @@ export class DonorsList {
           this.loadDonors();
         },
         error: (err) => {
-          this.errorMsg = err.error || 'Error deleting donor';
+          // Handle different error formats
+          if (err.error?.errors) {
+            // Server validation errors
+            this.errorMsg = err.error.errors.map((e: any) => e.message).join(', ');
+          } else if (err.error?.message) {
+            this.errorMsg = err.error.message;
+          } else if (typeof err.error === 'string') {
+            this.errorMsg = err.error;
+          } else if (err.message) {
+            this.errorMsg = err.message;
+          } else {
+            this.errorMsg = 'Error deleting donor';
+          }
         }
       });
     }
   }
   
   updateDonor(donorID: number) {
+    this.errorMsg = '';
     this.id = donorID;
   }
 
-  trackById(index: number, donor: DonorModel): number {
+  openAddDonor() {
+    this.errorMsg = '';
+    this.id = 0;
+  }
+
+  trackById(index: number, donor: DonorDTO): number {
     return donor.id;
   }
 

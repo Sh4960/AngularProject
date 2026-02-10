@@ -3,7 +3,7 @@ import { GiftService } from '../../../services/gift-service';
 import { GiftModel } from '../../../models/gift-model';
 import { GiftFilterDTO, GiftSortBy } from '../../../models/gift-filter.model';
 import { RaffleResultDTO } from '../../../models/raffle-result-model';
-import { RaffleReportDTO } from '../../../models/raffle-report-model';
+// import { RaffleReportDTO } from '../../../models/raffle-report-model';
 import { Gift } from '../gift/gift';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -314,34 +314,39 @@ export class GiftsList {
       }
     });
 }
-  raffleAll() {
-    this.giftSrv.raffleAllGifts().subscribe({
-      next: (report: RaffleReportDTO) => {
-        console.log('Raffle Report:', report);
-        if (report && report.results && report.results.length > 0) {
-          let message = `בוצעה הגרלה ל־${report.results.length} מתנות\nסך הכנסות: ₪${report.totalIncome}\n\nזוכים:\n`;
-          report.results.forEach(result => {
-            message += `${result.giftName}: ${result.winnerUserName}\n`;
-          });
-          alert(message);
-          this.raffleResult = report.results;
-          this.saveRaffleResultsToStorage();
-        } else {
-          alert('אין מתנות זמינות להגרלה (כבר הוגרלה או אין קניות)');
-        }
-        this.loadGifts();
-      },
-      error: (err) => {
-        console.error('Raffle Error:', err);
-        this.errorMsg = err.error || 'שגיאה בביצוע ההגרלה לכל המתנות';
-        alert(this.errorMsg);
-      }
-    });
-  }
+  // raffleAll() {
+  //   this.giftSrv.raffleAllGifts().subscribe({
+  //     next: (report: RaffleReportDTO) => {
+  //       console.log('Raffle Report:', report);
+  //       if (report && report.results && report.results.length > 0) {
+  //         let message = `בוצעה הגרלה ל־${report.results.length} מתנות\nסך הכנסות: ₪${report.totalIncome}\n\nזוכים:\n`;
+  //         report.results.forEach(result => {
+  //           message += `${result.giftName}: ${result.winnerUserName}\n`;
+  //         });
+  //         alert(message);
+  //         this.raffleResult = report.results;
+  //         this.saveRaffleResultsToStorage();
+  //       } else {
+  //         alert('אין מתנות זמינות להגרלה (כבר הוגרלה או אין קניות)');
+  //       }
+  //       this.loadGifts();
+  //     },
+  //     error: (err) => {
+  //       console.error('Raffle Error:', err);
+  //       this.errorMsg = err.error || 'שגיאה בביצוע ההגרלה לכל המתנות';
+  //       alert(this.errorMsg);
+  //     }
+  //   });
+  // }
   
   getWinnerName(giftId: number): string | null {
     const found = this.raffleResult.find(r => r.giftId === giftId);
     return found ? found.winnerUserName : null;
+  }
+
+  // הצגת רשימת רוכשים למתנה - ניווט לעמוד ייעודי
+  viewPurchasers(gift: GiftModel) {
+    this.router.navigate(['/gifts', gift.id, 'purchasers']);
   }
   
 }

@@ -74,6 +74,9 @@
             <button (click)="raffleGift(g.id)" [disabled]="g.isRaffled">
               🎲 בצע הגרלה
             </button>
+            <button (click)="viewPurchasers(g)" title="View Purchasers">
+              👥 רוכשים
+            </button>
           } @else {
             @if (g.isRaffled) {
               @if (getWinnerName(g.id)) {
@@ -107,9 +110,9 @@
 @if(isManager()){
   <button (click)="downloadPdf()">📄 הפקת דוח זוכים</button>
 }
-@if(isManager()){
+<!-- @if(isManager()){
   <button (click)="raffleAll()">🎲 בצע הגרלה לכל המתנות</button>
-}
+} -->
 
 @if(id >= 0){
 <app-gift [(selectedId)]="id" (selectedIdChange)="onGiftSaved($event)"></app-gift>

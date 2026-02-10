@@ -1,0 +1,52 @@
+<div class="purchasers-container">
+  <h3>רוכשים של המתנה: {{ giftName }}</h3>
+  
+  @if(errorMsg){
+    <div class="alert alert-danger">{{errorMsg}}</div>
+  }
+
+  @if(loading) {
+    <div class="loading">טוען נתונים...</div>
+  }
+
+  @if(!loading && purchasers.length === 0) {
+    <div class="no-data">אין רכישות שמולמו למתנה זו</div>
+  }
+
+  @if(!loading && purchasers.length > 0) {
+    <div class="summary">
+      <p><strong>סה"כ רוכשים:</strong> {{ purchasers.length }}</p>
+      <p><strong>סה"כ כרטיסים נרכשו:</strong> {{ totalQuantity }}</p>
+      <p><strong>סה"כ הכנסות:</strong> ₪{{ totalIncome }}</p>
+    </div>
+
+    <table class="table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>שם רוכש</th>
+          <th>דוא"ל</th>
+          <th>טלפון</th>
+          <th>כמות כרטיסים</th>
+          <th>סכום ששולם</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(purchaser of purchasers; track purchaser.id; let i = $index){
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td>{{ purchaser.userName }}</td>
+            <td>{{ purchaser.email }}</td>
+            <td>{{ purchaser.phone }}</td>
+            <td>{{ purchaser.quantity }}</td>
+            <td>₪{{ cardPrice * purchaser.quantity }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  <div class="actions">
+    <button (click)="goBack()">חזור לרשימת המתנות</button>
+  </div>
+</div>

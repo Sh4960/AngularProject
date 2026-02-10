@@ -22,9 +22,9 @@ export class Donor {
   selectedIdChange: EventEmitter<number> = new EventEmitter<number>();
 
   frmDonor: FormGroup = new FormGroup({
-    id: new FormControl(0, [Validators.required]),
+    id: new FormControl(0),
     name: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email]),
     phone: new FormControl('', [Validators.required]),
   });
 
@@ -59,7 +59,7 @@ export class Donor {
         });
       } else if(this.selectedId === 0){
         // תורם חדש
-        this.frmDonor.reset();
+        this.frmDonor.reset({ id: 0, name: '', email: '', phone: '' });
       }
     }
   }

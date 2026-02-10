@@ -1,6 +1,6 @@
-import { RaffleResultDTO } from './raffle-result-model';
+// import { RaffleResultDTO } from './raffle-result-model';
 
-export interface RaffleReportDTO {
-    results: RaffleResultDTO[];
-    totalIncome: number;
-}
+// export interface RaffleReportDTO {
+//     results: RaffleResultDTO[];
+//     totalIncome: number;
+// }

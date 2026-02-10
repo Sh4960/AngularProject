@@ -4,7 +4,7 @@ import { GiftModel } from '../models/gift-model';
 import { GiftDTO } from '../models/gift-dto-model';
 import { GiftFilterDTO } from '../models/gift-filter.model';
 import { RaffleResultDTO } from '../models/raffle-result-model';
-import { RaffleReportDTO } from '../models/raffle-report-model';
+// import { RaffleReportDTO } from '../models/raffle-report-model';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth-service';
 
@@ -72,13 +72,13 @@ export class GiftService {
         });
     }
 
-    raffleAllGifts() {
-        return this.httpClient.post<RaffleReportDTO>(
-            `${this.BASE_URL}/raffleAll`,
-            {},
-            { headers: this.authService.getAuthHeaders() }
-        );
-    }
+    // raffleAllGifts() {
+    //     return this.httpClient.post<RaffleReportDTO>(
+    //         `${this.BASE_URL}/raffleAll`,
+    //         {},
+    //         { headers: this.authService.getAuthHeaders() }
+    //     );
+    // }
 
   
   

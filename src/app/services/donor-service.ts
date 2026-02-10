@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { DonorModel } from '../models/donor-model';
-
+import { DonorDTO } from '../models/donor-dto-model';
 import { DonorFilterDTO } from '../models/donor-filter.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth-service';
@@ -17,7 +17,7 @@ export class DonorService {
 
   // קבלת כל התורמים
   getAllDonors() {
-      return this.httpClient.get<DonorModel[]>(this.BASE_URL, { headers: this.authService.getAuthHeaders() });
+      return this.httpClient.get<DonorDTO[]>(this.BASE_URL, { headers: this.authService.getAuthHeaders() });
   }
 
   // קבלת תורמים מסוננים
@@ -27,7 +27,7 @@ export class DonorService {
       if (filter.email) params = params.set('email', filter.email);
       if (filter.giftName) params = params.set('giftName', filter.giftName);
       
-      return this.httpClient.get<DonorModel[]>(`${this.BASE_URL}/filter`, { 
+      return this.httpClient.get<DonorDTO[]>(`${this.BASE_URL}/filter`, { 
           headers: this.authService.getAuthHeaders(),
           params: params
       });
@@ -48,6 +48,6 @@ export class DonorService {
   }
 
   removeDonor(donorId: number){
-      return this.httpClient.delete<void>(`${this.BASE_URL}/${donorId}`, { headers: this.authService.getAuthHeaders() });
+      return this.httpClient.delete(`${this.BASE_URL}/${donorId}`, { headers: this.authService.getAuthHeaders(), responseType: 'text' });
   }
 }

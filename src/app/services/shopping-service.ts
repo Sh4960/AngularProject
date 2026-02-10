@@ -52,8 +52,9 @@ export class ShoppingService {
 
   // מחיקת רכישה
   removeShopping(shoppingId: number) {
-    return this.httpClient.delete<void>(`${this.BASE_URL}/${shoppingId}`, { 
-      headers: this.authService.getAuthHeaders() 
+    return this.httpClient.delete(`${this.BASE_URL}/${shoppingId}`, { 
+      headers: this.authService.getAuthHeaders(),
+      responseType: 'text'
     });
   }
 

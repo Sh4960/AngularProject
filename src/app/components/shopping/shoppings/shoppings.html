@@ -1,95 +1,177 @@
 <div>
   
-
   @if (errorMsg) {
     <div style="color:red; padding: 10px; border: 1px solid red; border-radius: 4px;">{{ errorMsg }}</div>
   }
-  <h2>Shopping Cart</h2>
 
- 
-
-  <div class="sort-section">
-    <h4>Sort Purchases</h4>
-    <div class="sort-inputs">
-      <select [(ngModel)]="sort.sortBy" (change)="applySort()">
-        <option [ngValue]="undefined">No Sorting</option>
-        <option [ngValue]="ShoppingSortBy.Price">Sort by Price</option>
-        <option [ngValue]="ShoppingSortBy.Popularity">Sort by Popularity</option>
-      </select>
-      
-      <label>
-        <input 
-          type="checkbox" 
-          [(ngModel)]="sort.desc" 
-          (change)="applySort()"
-          [disabled]="!sort.sortBy"
-        />
-        Descending
-      </label>
-      
-      <button (click)="clearSort()">Clear Sorting</button>
-    </div>
+  <!-- Navigation buttons between views -->
+  <div class="view-tabs">
+    @if (!isManager()) {
+      <button 
+        (click)="switchViewMode('cart')" 
+        [class.active]="viewMode === 'cart'"
+        class="tab-button">
+        My Shopping Cart
+      </button>
+      <button 
+        (click)="switchViewMode('orders')" 
+        [class.active]="viewMode === 'orders'"
+        class="tab-button">
+        My Orders
+      </button>
+    }
+    @if (isManager()) {
+      <button 
+        (click)="switchViewMode('admin')" 
+        [class.active]="viewMode === 'admin'"
+        class="tab-button admin-tab">
+        Orders Management
+      </button>
+    }
   </div>
+
+  <h2>{{ getScreenTitle() }}</h2>
+
+  <!-- Sorting - only for orders and admin views, not shopping cart -->
+  @if (viewMode !== 'cart') {
+    @if (shoppings$ | async; as shoppings) {
+      @if (shoppings.length > 0) {
+        <div class="sort-section">
+          <h4>Sort Orders</h4>
+          <div class="sort-inputs">
+            <select [(ngModel)]="sort.sortBy" (change)="applySort()">
+              <option [ngValue]="undefined">No Sorting</option>
+              <option [ngValue]="ShoppingSortBy.Price">Sort by Price</option>
+              <option [ngValue]="ShoppingSortBy.Popularity">Sort by Popularity</option>
+            </select>
+            
+            <label>
+              <input 
+                type="checkbox" 
+                [(ngModel)]="sort.desc" 
+                (change)="applySort()"
+                [disabled]="!sort.sortBy"
+              />
+              Descending
+            </label>
+            
+            <button (click)="clearSort()">Clear Sorting</button>
+          </div>
+        </div>
+      }
+    }
+  }
 
   @if (shoppings$ | async; as shoppings) {
     
     @if (shoppings.length === 0) {
-      <p>No purchases</p>
+      <div class="empty-state">
+        @if (viewMode === 'cart') {
+          <h3>Your cart is empty</h3>
+          <p>Add gifts from the gift list to see them here</p>
+          <button (click)="goToGifts()" class="btn-continue-shopping">Go Shopping</button>
+        } @else if (viewMode === 'orders') {
+          <h3>No orders yet</h3>
+          <p>After payment, your orders will appear here</p>
+        } @else {
+          <h3>No approved orders in the system</h3>
+          <p>Approved user orders will appear here</p>
+        }
+      </div>
     } @else {
       
       <table class="table-bordered">
         <thead>
           <tr>
+            <!-- User column only in admin view -->
+            @if (viewMode === 'admin') {
+              <th>User</th>
+            }
             <th>Gift Name</th>
             <th>Card Price</th>
             <th>Quantity</th>
             <th>Total</th>
-            <th>Actions</th>
+            <th>Status</th>
+            @if (viewMode === 'cart') {
+              <th>Actions</th>
+            }
           </tr>
         </thead>
         <tbody>
           @for (shopping of shoppings; track shopping.id) {
-            <!-- טיוטות - רגיל -->
-            @if (shopping.isDraft !== false) {
-              <tr [style.opacity]="isPaymentProcessing ? '0.5' : '1'">
-                <td>{{ shopping.giftName }}</td>
-                <td>{{ shopping.cardPrice }}</td>
+            <tr [style.opacity]="isPaymentProcessing && viewMode === 'cart' ? '0.5' : '1'">
+              
+              <!-- User column - admin only -->
+              @if (viewMode === 'admin') {
+                <td>{{ shopping.userName || shopping.email }}</td>
+              }
+              
+              <td>{{ shopping.giftName }}</td>
+              <td>${{ shopping.cardPrice }}</td>
+              
+              <!-- Quantity with buttons only in shopping cart -->
+              @if (viewMode === 'cart') {
                 <td>
                   <button (click)="decreaseQuantity(shopping)" class="btn-qty" [disabled]="isPaymentProcessing">-</button>
                   {{ shopping.quantity }}
                   <button (click)="increaseQuantity(shopping)" class="btn-qty" [disabled]="isPaymentProcessing">+</button>
                 </td>
-                <td>{{ shopping.cardPrice * shopping.quantity }}</td>
-                <td style="color: green;">טיוטה</td>
-                <td>
-                  <button (click)="removeShopping(shopping)" class="btn-delete" [disabled]="isPaymentProcessing">מחק</button>
-                </td>
-              </tr>
-            }
-            
-            <!-- רכישות שאושרו - disabled -->
-            @if (shopping.isDraft === false) {
-              <tr [style.opacity]="'0.6'" [style.backgroundColor]="'#f0f0f0'">
-                <td>{{ shopping.giftName }}</td>
-                <td>{{ shopping.cardPrice }}</td>
+              } @else {
                 <td style="text-align: center;">{{ shopping.quantity }}</td>
-                <td>{{ shopping.cardPrice * shopping.quantity }}</td>
-                <td style="color: gray;">אושרה</td>
-                <td style="color: gray;">-</td>
-              </tr>
-            }
-
+              }
+              
+              <td>${{ shopping.cardPrice * shopping.quantity }}</td>
+              
+              <!-- Status -->
+              <td>
+                @if (viewMode === 'cart') {
+                  <span style="color: orange;">Pending Payment</span>
+                } @else {
+                  <span style="color: green;">Paid</span>
+                }
+              </td>
+              
+              <!-- Actions only in shopping cart -->
+              @if (viewMode === 'cart') {
+                <td>
+                  <button (click)="removeShopping(shopping)" class="btn-delete" [disabled]="isPaymentProcessing">Delete</button>
+                </td>
+              }
+              
+            </tr>
           }
         </tbody>
       </table>
-
-      <div class="total-section">
-        <h3>סה"כ לתשלום: {{ getTotalPrice(getDraftsOnly(shoppings)) }}₪</h3>
-        <button (click)="paymentAll(shoppings)" class="btn-payment" [disabled]="isPaymentProcessing || getDraftsOnly(shoppings).length === 0">
-          {{ isPaymentProcessing ? 'מעבד תשלום...' : 'בצע תשלום' }}
-        </button>
-
-      </div>
+      <!-- Payment button only in shopping cart -->
+      @if (viewMode === 'cart') {
+        <div class="total-section">
+          <h3>Total to Pay: ${{ getTotalPrice(shoppings) }}</h3>
+          <button 
+            (click)="paymentAll(shoppings)" 
+            class="btn-payment" 
+            [disabled]="isPaymentProcessing || shoppings.length === 0">
+            {{ isPaymentProcessing ? 'Processing Payment...' : 'Make Payment' }}
+          </button>
+          <button 
+            (click)="goToGifts()" 
+            class="btn-continue-shopping">
+            Continue Shopping
+          </button>
+        </div>
+      }
+      
+      <!-- Summary for other modes -->
+      @if (viewMode !== 'cart') {
+        <div class="summary-section">
+          <h3>
+            @if (viewMode === 'orders') {
+              Total in My Orders: ${{ getTotalPrice(shoppings) }}
+            } @else {
+              Total Orders in System: ${{ getTotalPrice(shoppings) }}
+            }
+          </h3>
+        </div>
+      }
       
     }
     
