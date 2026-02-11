@@ -44,24 +44,25 @@ export class GiftsList {
 
   // Enum for template access
   GiftSortBy = GiftSortBy;
-  
-  private readonly STORAGE_KEY = 'raffleResults';
 
   ngOnInit() {
-    // טעינת תוצאות הגרלה מ-localStorage
-    this.loadRaffleResultsFromStorage();
+    // טעינת זוכים מהשרת (נתונים אמיתיים מבסיס הנתונים)
+    this.loadWinnersFromServer();
   }
 
-  // טעינת תוצאות הגרלה מ-localStorage
-  private loadRaffleResultsFromStorage() {
-    try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
-      if (stored) {
-        this.raffleResult = JSON.parse(stored);
-           }
-    } catch (error) {
-      console.error('Error loading raffle results from storage:', error);
-    }
+  // טעינת זוכים מהשרת
+  private loadWinnersFromServer() {
+    this.giftSrv.getAllWinners().subscribe({
+      next: (winners: RaffleResultDTO[]) => {
+        this.raffleResult = winners;
+        console.log('Loaded winners from server:', winners);
+      },
+      error: (err) => {
+        console.error('Error loading winners from server:', err);
+        this.errorMsg = 'שגיאה בטעינת זוכים מהשרת';
+        this.raffleResult = [];
+      }
+    });
   }
 
   // טעינת מתנות מהשרת
@@ -168,14 +169,7 @@ export class GiftsList {
  
 
 
-  // שמירת תוצאות הגרלה ב-localStorage
-  private saveRaffleResultsToStorage() {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.raffleResult));
-    } catch (error) {
-      console.error('Error saving raffle results to storage:', error);
-    }
-  }
+
 
   // טעינת רשימת מתנות מהשרת
   
@@ -259,11 +253,8 @@ export class GiftsList {
     this.giftSrv.raffleGift(giftId).subscribe({
       next: (res: RaffleResultDTO) => {
         alert(`🎉 הזוכה במתנה "${res.giftName}" הוא: ${res.winnerUserName}`);
-         this.raffleResult = [
-        ...this.raffleResult?.filter(r => r.giftId !== res.giftId) || [],
-        res
-      ];
-        this.saveRaffleResultsToStorage();
+        // טעינה מחדש של זוכים מהשרת כדי לקבל נתונים עדכניים
+        this.loadWinnersFromServer();
         this.loadGifts();
       },
       error: (err) => {
@@ -292,28 +283,36 @@ export class GiftsList {
   // }
 
   downloadPdf() {
-  this.giftSrv.getRaffleWinnersPdf()
-    // .pipe(takeUntil(this.destroy$))  // ⬅️ 1. Prevent memory leak
-    .subscribe({
-      next: (blob: Blob) => {
-        // 2. Create temporary URL for the blob
-        const url = window.URL.createObjectURL(blob);
-        
-        // 3. Create invisible download link
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `raffle-winners-${new Date().toISOString().split('T')[0]}.pdf`;
-        
-        // 4. Trigger download
-        document.body.appendChild(a);
-        a.click();
-        
-        // 5. Clean up
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);  // ⬅️ Free memory!
-      }
-    });
-}
+    this.giftSrv.getRaffleWinnersPdf()
+      .subscribe({
+        next: (blob: Blob) => {
+          // Create temporary URL for the blob
+          const url = window.URL.createObjectURL(blob);
+          
+          // Create invisible download link
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `raffle-winners-${new Date().toISOString().split('T')[0]}.pdf`;
+          
+          // Trigger download
+          document.body.appendChild(a);
+          a.click();
+          
+          // Clean up
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+          console.error('PDF Download Error:', err);
+          this.errorMsg = err.error || 'שגיאה בהורדת דוח הזוכים';
+          if (err.status === 401) {
+            alert('אין הרשאה להורדת הדוח. אנא התחבר מחדש.');
+          } else {
+            alert('שגיאה בהורדת דוח הזוכים');
+          }
+        }
+      });
+  }
   // raffleAll() {
   //   this.giftSrv.raffleAllGifts().subscribe({
   //     next: (report: RaffleReportDTO) => {
@@ -347,6 +346,19 @@ export class GiftsList {
   // הצגת רשימת רוכשים למתנה - ניווט לעמוד ייעודי
   viewPurchasers(gift: GiftModel) {
     this.router.navigate(['/gifts', gift.id, 'purchasers']);
+  }
+
+  // הצגת סך הכנסות המכירות
+  showTotalIncome() {
+    this.giftSrv.getTotalIncome().subscribe({
+      next: (response) => {
+        alert(`💰 סך הכנסות המכירות: ₪${response.totalIncome.toFixed(2)}`);
+      },
+      error: (err) => {
+        console.error('Error loading total income:', err);
+        this.errorMsg = 'שגיאה בטעינת סך ההכנסות';
+      }
+    });
   }
   
 }

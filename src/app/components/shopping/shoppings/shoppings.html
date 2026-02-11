@@ -103,7 +103,7 @@
               
               <!-- User column - admin only -->
               @if (viewMode === 'admin') {
-                <td>{{ shopping.userName || shopping.email }}</td>
+                <td>{{ shopping.userName || shopping.email || 'User #' + shopping.userId }}</td>
               }
               
               <td>{{ shopping.giftName }}</td>

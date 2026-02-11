@@ -71,9 +71,18 @@
           @if (isManager()) {
             <button (click)="removeGift(g.id)">❌</button>
             <button (click)="updateGift(g.id)">✏️</button>
-            <button (click)="raffleGift(g.id)" [disabled]="g.isRaffled">
-              🎲 בצע הגרלה
-            </button>
+            @if (getWinnerName(g.id)) {
+              <!-- מתנה שכבר הוגרלה ויש לה זוכה בבסיס הנתונים -->
+              <div class="winner-label">🏆 זוכה: {{ getWinnerName(g.id) }}</div>
+            } @else if (g.isRaffled) {
+              <!-- מתנה שמסומנת כהוגרלה אבל אין זוכה בבסיס הנתונים -->
+              <div class="raffled-label">✅ הוגרלה</div>
+            } @else {
+              <!-- מתנה שעדיין לא הוגרלה -->
+              <button (click)="raffleGift(g.id)">
+                🎲 בצע הגרלה
+              </button>
+            }
             <button (click)="viewPurchasers(g)" title="View Purchasers">
               👥 רוכשים
             </button>
@@ -109,6 +118,7 @@
 
 @if(isManager()){
   <button (click)="downloadPdf()">📄 הפקת דוח זוכים</button>
+  <button (click)="showTotalIncome()">💰 הצג סך הכנסות</button>
 }
 <!-- @if(isManager()){
   <button (click)="raffleAll()">🎲 בצע הגרלה לכל המתנות</button>

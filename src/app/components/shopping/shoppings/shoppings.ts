@@ -47,32 +47,26 @@ export class Shoppings {
   // טעינת רכישות מהשרת
   refreshShoppings() {
     this.errorMsg = '';
-    const userId = this.authSrv.getUserIdFromToken();
     
-    // טען כל הרכישות מהשרת
+    // השרת כבר מסנן לפי משתמש ותפקיד:
+    // - מנהל מקבל את כל הרכישות
+    // - לקוח מקבל רק את הרכישות שלו
     this.shoppingSrv.getAllShoppings().subscribe({
       next: (allShoppings: any[]) => {
         
-        // סנן לפי מצב התצוגה
+        // סנן לפי מצב התצוגה (draft vs confirmed)
         let filteredShoppings: any[] = [];
         
         if (this.viewMode === 'cart') {
-          // סל קניות: רק טיוטות של המשתמש הנוכחי  
-          filteredShoppings = allShoppings.filter((s: any) => {
-            const isUserMatch = s.userId === userId;
-            const isDraft = s.isDraft !== false; // כל מה שלא false במפורש זה טיוטה
-            return isUserMatch && isDraft;
-          });
+          // סל קניות: רק טיוטות (isDraft === true)
+          filteredShoppings = allShoppings.filter((s: any) => s.isDraft === true);
         } else if (this.viewMode === 'orders') {
-          // ההזמנות שלי: רק רכישות מאושרות של המשתמש הנוכחי
-          filteredShoppings = allShoppings.filter((s: any) => {
-            return s.userId === userId && s.isDraft === false;
-          });
+          // ההזמנות שלי: רק רכישות מאושרות (isDraft === false)
+          filteredShoppings = allShoppings.filter((s: any) => s.isDraft === false);
         } else if (this.viewMode === 'admin') {
-          // ניהול רכישות: רק רכישות מאושרות של כל המשתמשים (למנהל בלבד)
-          filteredShoppings = allShoppings.filter((s: any) => {
-            return s.isDraft === false;
-          });
+          // ניהול רכישות: רק רכישות מאושרות (isDraft === false)
+          // השרת כבר מחזיר את כל הרכישות כי המשתמש הוא מנהל
+          filteredShoppings = allShoppings.filter((s: any) => s.isDraft === false);
         }
         
         // טען מתנות לקבל שמות ומחירים
@@ -88,25 +82,34 @@ export class Shoppings {
               };
             });
             
-            // קבץ רכישות לפי giftId
-            const consolidated = this.getConsolidatedShoppings(shoppingWithGifts);
-            const sorted = this.applySortToArray(consolidated);
+            // קבץ רכישות לפי giftId (רק בסל קניות)
+            let processedShoppings = shoppingWithGifts;
+            if (this.viewMode === 'cart') {
+              processedShoppings = this.getConsolidatedShoppings(shoppingWithGifts);
+            }
+            
+            const sorted = this.applySortToArray(processedShoppings);
             this.shoppings$ = of(sorted);
           },
           error: () => {
-            // קבץ רכישות לפי giftId
-            const consolidated = this.getConsolidatedShoppings(filteredShoppings.map((s: any) => ({
+            // אם שגיאה בטעינת מתנות, הראה את הרכישות בלי שמות מתנות
+            let processedShoppings = filteredShoppings.map((s: any) => ({
               ...s,
               giftName: 'Unknown Gift',
               cardPrice: 0
-            })));
-            const sorted = this.applySortToArray(consolidated);
+            }));
+            
+            if (this.viewMode === 'cart') {
+              processedShoppings = this.getConsolidatedShoppings(processedShoppings);
+            }
+            
+            const sorted = this.applySortToArray(processedShoppings);
             this.shoppings$ = of(sorted);
           }
         });
       },
-      error: () => {
-        this.errorMsg = 'Error loading orders';
+      error: (err) => {
+        this.errorMsg = 'Error loading orders: ' + (err.error || err.message || 'Unknown error');
         this.shoppings$ = of([]);
       }
     });
@@ -214,6 +217,7 @@ export class Shoppings {
     
     // מונים לעקיבה אחרי תוצאות
     let successCount = 0;
+    let errorCount = 0;
     const totalCount = allShoppingIds.length;
 
     // אשר כל רכישה
@@ -223,16 +227,25 @@ export class Shoppings {
           successCount++;
           
           // אם כל הרכישות אושרו, הצג הודעת הצלחה
-          if (successCount === totalCount) {
-            this.errorMsg = 'Payment completed successfully! Items moved to your orders';
+          if (successCount + errorCount === totalCount) {
+            if (errorCount === 0) {
+              this.errorMsg = '';
+              alert('Payment completed successfully! Items moved to your orders');
+            } else {
+              this.errorMsg = `Payment partially completed: ${successCount} succeeded, ${errorCount} failed`;
+            }
             this.isPaymentProcessing = false;
             this.refreshShoppings();
           }
         },
-        error: () => {
-          // If error, display message
-          this.errorMsg = 'Error processing payment';
-          this.isPaymentProcessing = false;
+        error: (err) => {
+          errorCount++;
+          
+          if (successCount + errorCount === totalCount) {
+            this.errorMsg = `Error processing payment: ${err.error || err.message || 'Unknown error'}`;
+            this.isPaymentProcessing = false;
+            this.refreshShoppings();
+          }
         }
       });
     });
@@ -278,8 +291,8 @@ export class Shoppings {
     this.viewMode = mode;
     this.refreshShoppings();
   }
-
-  // Apply sorting to array based on sort settings
+  
+// Apply sorting to array based on sort settings
   applySortToArray(shoppings: any[]): any[] {
     if (!this.sort.sortBy) {
       return shoppings;
@@ -291,11 +304,9 @@ export class Shoppings {
       let compareValue = 0;
       
       if (this.sort.sortBy === ShoppingSortBy.Price) {
-        // Sort by total price (cardPrice * quantity)
-        const totalA = a.cardPrice * a.quantity;
-        const totalB = b.cardPrice * b.quantity;
-        compareValue = totalA - totalB;
-      } else if (this.sort.sortBy === ShoppingSortBy.Popularity) {
+        // Sort by unit price (cardPrice)
+        compareValue = a.cardPrice - b.cardPrice;
+        } else if (this.sort.sortBy === ShoppingSortBy.Popularity) {
         // Sort by quantity
         compareValue = a.quantity - b.quantity;
       }
@@ -306,7 +317,7 @@ export class Shoppings {
     
     return sortedArray;
   }
-
+  
   // בדיקה אם המשתמש הוא מנהל
   isManager(): boolean {
     return this.authSrv.isManager();

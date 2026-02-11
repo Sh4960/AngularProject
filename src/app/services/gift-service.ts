@@ -72,6 +72,27 @@ export class GiftService {
         });
     }
 
+    // קבלת כל הזוכים בהגרלות מהשרת
+    getAllWinners() {
+        return this.httpClient.get<RaffleResultDTO[]>('https://localhost:7164/api/Winners', {
+            headers: this.authService.getAuthHeaders()
+        });
+    }
+
+    // בדיקה אם מתנה כבר הוגרלה (יש לה זוכה)
+    getWinnerByGiftId(giftId: number) {
+        return this.httpClient.get<RaffleResultDTO | null>(`https://localhost:7164/api/Winners/gift/${giftId}`, {
+            headers: this.authService.getAuthHeaders()
+        });
+    }
+
+    // מחיקת זוכה (לצורך הגרלה מחדש או תיקון שגיאות)
+    deleteWinner(giftId: number) {
+        return this.httpClient.delete<void>(`https://localhost:7164/api/Winners/gift/${giftId}`, {
+            headers: this.authService.getAuthHeaders()
+        });
+    }
+
     // raffleAllGifts() {
     //     return this.httpClient.post<RaffleReportDTO>(
     //         `${this.BASE_URL}/raffleAll`,
@@ -80,6 +101,11 @@ export class GiftService {
     //     );
     // }
 
-  
+    // קבלת סך הכנסות מכל המכירות
+    getTotalIncome() {
+        return this.httpClient.get<{ totalIncome: number, message: string }>(`${this.BASE_URL}/total-income`, { 
+            headers: this.authService.getAuthHeaders()
+        });
+    }
   
 }
