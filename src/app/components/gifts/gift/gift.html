@@ -43,6 +43,16 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <div class="form-label">Image URL</div>
+                <div>
+                    <input type="text" class="form-control" formControlName="imageUrl" placeholder="https://example.com/image.jpg" />
+                    @if (frmGift.controls['imageUrl'].value) {
+                        <img [src]="frmGift.controls['imageUrl'].value" alt="Preview" style="max-width: 200px; margin-top: 10px; border-radius: 8px;" />
+                    }
+                </div>
+            </div>
+
             @if (serverError) {
                 <div class="error-message">
                     ⚠️ {{ serverError }}

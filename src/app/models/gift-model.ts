@@ -8,5 +8,6 @@ export class GiftModel {
     donorId: number = 0;
     donorName: string = '';
     isRaffled: boolean = false;
+    imageUrl: string = ''; // כתובת URL לתמונת המתנה
     shoppings: ShoppingModel[] = []; // רשימת הרכישות של המתנה
 }

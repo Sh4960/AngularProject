@@ -1,0 +1,23 @@
+<!-- דוגמאות URL לתמונות שאפשר להשתמש בהן מיד -->
+
+<!-- 🎁 תמונות מתנות מ-Unsplash -->
+https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=300&h=300&fit=crop
+https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=300&h=300&fit=crop
+https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=300&h=300&fit=crop
+
+<!-- 💻 אלקטרוניקה -->
+https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=300&fit=crop (laptop)
+https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop (headphones)
+https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop (watch)
+
+<!-- 📱 גאדג'טים -->
+https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=300&fit=crop (phone)
+https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=300&h=300&fit=crop (tablet)
+https://images.unsplash.com/photo-1585792180666-f7347c490ee2?w=300&h=300&fit=crop (camera)
+
+<!-- 📚 ספרים -->
+https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=300&fit=crop
+
+<!-- עוד אופציות -->
+https://via.placeholder.com/300 (placeholder פשוט)
+https://picsum.photos/300 (תמונה אקראית)

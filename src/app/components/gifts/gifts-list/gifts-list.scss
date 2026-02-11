@@ -43,3 +43,20 @@ button {
   text-align: center;
   font-weight: bold;
 }
+
+.gift-thumbnail {
+  // תמונת מתנה בטבלה
+  max-width: 80px;
+  max-height: 80px;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.no-image {
+  // אייקון כאשר אין תמונה
+  font-size: 2rem;
+  display: inline-block;
+}

@@ -33,6 +33,7 @@ export class Gift implements OnInit {
     cardPrice: new FormControl(10, [Validators.required]),
     category: new FormControl(''),
     donorId: new FormControl('', Validators.required),
+    imageUrl: new FormControl(''), // כתובת URL לתמונת המתנה
     isRaffled: new FormControl(false),
   });
 
@@ -86,6 +87,7 @@ export class Gift implements OnInit {
       cardPrice: this.frmGift.value.cardPrice,
       category: this.frmGift.value.category || '',
       donorId: this.frmGift.value.donorId,
+      imageUrl: this.frmGift.value.imageUrl || '',
       isRaffled: this.frmGift.value.isRaffled
     };
 
@@ -118,6 +120,7 @@ export class Gift implements OnInit {
           cardPrice: 10,
           category: '',
           donorId: '',
+          imageUrl: '',
           isRaffled: false
         });
       } else {

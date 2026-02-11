@@ -51,6 +51,7 @@
   <thead>
     <tr>
       <th>Gift ID</th>
+      <th>Image</th>
       <th>Gift Name</th>
       <th>Donor Name</th>
       <th>Card Price</th>
@@ -62,6 +63,13 @@
     @for(g of gifts$ | async; track g.id){
       <tr>
         <td>{{g.id}}</td>
+        <td>
+          @if (g.imageUrl) {
+            <img [src]="g.imageUrl" [alt]="g.name" class="gift-thumbnail" />
+          } @else {
+            <span class="no-image">🎁</span>
+          }
+        </td>
         <td>{{g.name}}</td>
         <td>{{g.donorName}}</td>
         <td>{{g.cardPrice}}</td>
